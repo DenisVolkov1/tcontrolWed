@@ -36,6 +36,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+
     </repositories>
      
     <pluginRepositories>
@@ -122,6 +123,23 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+        <!-- my DEPENDENCY my DEPENDENCY  my DEPENDENCY  my DEPENDENCY  my DEPENDENCY-->
+        <dependency>  <!-- eclipse paho -->
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+ 		<dependency> <!-- pagination component -->
+   			<groupId>org.vaadin.klaudeta</groupId>
+  			<artifactId>grid-pagination</artifactId>
+   			<version>2.0.10</version>
+		</dependency>
+		<dependency> <!-- lookup field component -->
+   			<groupId>com.vaadin.componentfactory</groupId>
+  			<artifactId>lookup-field-flow</artifactId>
+   			<version>1.0.6</version>
+		</dependency>
+         <!-- my DEPENDENCY my DEPENDENCY  my DEPENDENCY  my DEPENDENCY  my DEPENDENCY-->
     </dependencies>
 
     <build>

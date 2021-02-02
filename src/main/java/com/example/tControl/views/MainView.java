@@ -1,5 +1,7 @@
 package com.example.tControl.views;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 import com.vaadin.flow.component.Component;
@@ -12,6 +14,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
@@ -32,16 +36,42 @@ import com.vaadin.flow.server.PWA;
 @CssImport("./styles/views/main/main-view.css")
 @PWA(name = "My Project", shortName = "My Project", enableInstallPrompt = false)
 @JsModule("./styles/shared-styles.js")
+
 public class MainView extends AppLayout {
 
 	private final Tabs menu;
     private H1 viewTitle;
+    private H1 time;
+    private H1 date;
+    private TimeAndDateDeamonThread andDateDeamonThread;
 
     public MainView() {
         setPrimarySection(Section.NAVBAR);
         addToNavbar(true, createHeaderContent());
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
+    }
+    private class TimeAndDateDeamonThread extends Thread {
+    	
+    	public TimeAndDateDeamonThread() {
+    		
+    		setDaemon(true);
+    	}
+    	public void run() {
+            while (true) {
+
+                DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                DateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
+
+                time.setText(timeFormat.format( System.currentTimeMillis()));
+                date.setText(dateFormat.format( System.currentTimeMillis()));
+                System.out.println("time "+timeFormat.format(System.currentTimeMillis())+"date "+dateFormat.format(System.currentTimeMillis()));
+                
+                try {sleep(500);} catch (InterruptedException e) {}
+                                    	
+            }
+        }
+    	
     }
 
     private Component createHeaderContent() {
@@ -53,6 +83,17 @@ public class MainView extends AppLayout {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.add(new DrawerToggle());
         viewTitle = new H1();
+       // HorizontalLayout layout2 = new HorizontalLayout();
+       // layout2.setAlignItems(Alignment.END);
+//        date = new H1("21.01.2021");
+//        date.getStyle().set("margin-left", "auto");
+//        date.getStyle().set("margin-right", "20px");
+//        time = new H1("20:29");
+//        andDateDeamonThread = new TimeAndDateDeamonThread();
+//        andDateDeamonThread.start();
+       // time.getStyle().set("margin-left", "auto");
+        //time.getStyle().set("margin-right", "20px");
+      //  layout2.add(time,date);
         layout.add(viewTitle);
         //layout.add(new Avatar());
         return layout;
