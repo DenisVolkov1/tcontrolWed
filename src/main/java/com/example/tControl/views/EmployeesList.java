@@ -13,6 +13,7 @@ import com.example.tControl.pojo.Employee;
 import com.vaadin.componentfactory.lookupfield.LookupField;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -28,6 +29,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -41,12 +43,11 @@ public class EmployeesList extends VerticalLayout {
 	public EmployeesList() {
 		List<Employee> l = new ArrayList<Employee>();
 		for (int i = 0; i < 70; i++) {
-			if (i==68) {
+			if (i==59) {
 				Employee e = new Employee(new Integer(i).toString(),"Сидоров Вася Чепухов", "111111111", "Страхование", "Повар");
 				l.add(e);
 				e5 = e;
 			} else {
-				System.out.println(new Integer(i).toString());
 				Employee e = new Employee(new Integer(i).toString(),"Петров Илья Чепухов", "456123258", "Страхование", "Повар");
 				l.add(e);
 			
@@ -96,25 +97,30 @@ public class EmployeesList extends VerticalLayout {
 		gridPaginatedEmployees.addColumn(Employee::getIdCard)  		  .setHeader("ID Card").setSortable(true);
 		gridPaginatedEmployees.addColumn(Employee::getDivision)       .setHeader("Division").setSortable(true);
 		gridPaginatedEmployees.addColumn(Employee::getPosition)       .setHeader("Position").setSortable(true);
-
-	
-
+		gridPaginatedEmployees.setSizeFull();
+		gridPaginatedEmployees.setHeight("74%");
 		gridPaginatedEmployees.setDataProvider(DataProvider.ofCollection(l));
 		// Sets the max number of items to be rendered on the grid for each page
 		gridPaginatedEmployees.setPageSize(16);
-		
 		gridPaginatedEmployees.setSelectionMode(SelectionMode.SINGLE); 
 		GridSelectionModel<Employee> m  =  gridPaginatedEmployees.getSelectionModel();
 		// Sets how many pages should be visible on the pagination before and/or after the current selected page
 		gridPaginatedEmployees.setPaginatorSize(5);
-		
+		//l2.add(gridPaginatedEmployees);
+		//l2.getStyle().set("overflow", "auto");
+		//l2.setHeight("650px");
+		//gridPaginatedEmployees.scrollToIndex(50);
 		searchIdButton.addClickListener(event -> {
 			m.select(e5);
+			ListDataProvider listDataProvider = (ListDataProvider) gridPaginatedEmployees.getDataProvider();
+			ArrayList items = (new ArrayList(listDataProvider.getItems()));
+			int index = items.indexOf(e5);
+			System.out.println(index);
+			gridPaginatedEmployees.scrollToIndex(index);
 		});
-		//m.select(e5);
-		
 		
 		HorizontalLayout i = new HorizontalLayout();
+		i.getStyle().set("margin-right", "20px");
 		i.setAlignItems(Alignment.START);		
 		Select<Integer> paginator = new Select<>();
 		paginator.addValueChangeListener(event -> {
