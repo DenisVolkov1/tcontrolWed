@@ -38,10 +38,12 @@ import com.vaadin.flow.router.Route;
 @CssImport("./styles/views/employees/employees.css")
 @Tag(value = "d2")
 public class EmployeesList extends VerticalLayout {
-	
+	private Select<Integer> paginator;
+	private PaginatedGrid<Employee> gridPaginatedEmployees;
+	private List<Employee> l;
 	Employee e5 = null;
 	public EmployeesList() {
-		List<Employee> l = new ArrayList<Employee>();
+		l = new ArrayList<Employee>();
 		for (int i = 0; i < 70; i++) {
 			if (i==59) {
 				Employee e = new Employee(new Integer(i).toString(),"Сидоров Вася Чепухов", "111111111", "Страхование", "Повар");
@@ -90,8 +92,7 @@ public class EmployeesList extends VerticalLayout {
 		
 		searchLayout.add(lookupField, searchidCardLayout);
 		
-		PaginatedGrid<Employee> gridPaginatedEmployees = new PaginatedGrid<>();
-		
+		gridPaginatedEmployees = new PaginatedGrid<>();
 		gridPaginatedEmployees.addColumn(Employee::getPersonnelNumber).setHeader("Personnel Number").setSortable(true);
 		gridPaginatedEmployees.addColumn(Employee::getFio)			  .setHeader("Fio").setSortable(true);
 		gridPaginatedEmployees.addColumn(Employee::getIdCard)  		  .setHeader("ID Card").setSortable(true);
@@ -101,7 +102,7 @@ public class EmployeesList extends VerticalLayout {
 		gridPaginatedEmployees.setHeight("74%");
 		gridPaginatedEmployees.setDataProvider(DataProvider.ofCollection(l));
 		// Sets the max number of items to be rendered on the grid for each page
-		gridPaginatedEmployees.setPageSize(16);
+		gridPaginatedEmployees.setPageSize(20);
 		gridPaginatedEmployees.setSelectionMode(SelectionMode.SINGLE); 
 		GridSelectionModel<Employee> m  =  gridPaginatedEmployees.getSelectionModel();
 		// Sets how many pages should be visible on the pagination before and/or after the current selected page
@@ -111,18 +112,27 @@ public class EmployeesList extends VerticalLayout {
 		//l2.setHeight("650px");
 		//gridPaginatedEmployees.scrollToIndex(50);
 		searchIdButton.addClickListener(event -> {
-			m.select(e5);
+			//m.select(e5);
+			//gridPaginatedEmployees.refreshPaginator();
 			ListDataProvider listDataProvider = (ListDataProvider) gridPaginatedEmployees.getDataProvider();
 			ArrayList items = (new ArrayList(listDataProvider.getItems()));
+			System.out.println(items.toString());
+			
 			int index = items.indexOf(e5);
-			System.out.println(index);
-			gridPaginatedEmployees.scrollToIndex(index);
+
+			//gridPaginatedEmployees.refreshPaginator();
+			//System.out.println(gridPaginatedEmployees.getSelectedItems());
+			//System.out.println(index);
+
+			//gridPaginatedEmployees.setPage(3);
+			selectRow(e5);
+			
 		});
 		
 		HorizontalLayout i = new HorizontalLayout();
 		i.getStyle().set("margin-right", "20px");
 		i.setAlignItems(Alignment.START);		
-		Select<Integer> paginator = new Select<>();
+		paginator = new Select<>();
 		paginator.addValueChangeListener(event -> {
 			gridPaginatedEmployees.setPageSize(event.getValue());
 
@@ -135,6 +145,46 @@ public class EmployeesList extends VerticalLayout {
 	
 		add(searchLayout,gridPaginatedEmployees,i);
 		
+	}
+	private void selectRow(Employee employee) {
+
+	
+		int totalPages = 0;
+		if (l.size() > 0) {
+			totalPages = (int) Math.ceil((float)l.size() / paginator.getValue()); 
+		} 
+		
+		System.out.println(getINdex(employee)%paginator.getValue());
+		
+//		for (int i = 1; totalPages >= i; i++) {
+//			gridPaginatedEmployees.setPage(i);
+//			gridPaginatedEmployees.setPageSize(l.size());
+//
+//			
+//			ListDataProvider listDataProvider = (ListDataProvider) gridPaginatedEmployees.getDataProvider();
+//			ArrayList items = (new ArrayList(listDataProvider.getItems()));
+//
+//			int index = items.indexOf(e5);
+//			System.out.println(index);
+//			System.out.println(gridPaginatedEmployees.getPage());
+//			if (index != -1) {
+//				System.out.println(index);
+//
+//				break;
+//			}
+//		}
+
+
+		
+	}
+	private int getINdex(Employee employee) {
+		int index = 0;
+		gridPaginatedEmployees.setPageSize(l.size());
+		ListDataProvider listDataProvider = (ListDataProvider) gridPaginatedEmployees.getDataProvider();
+		ArrayList items = (new ArrayList(listDataProvider.getItems()));
+		index = items.indexOf(employee);
+		gridPaginatedEmployees.setPageSize(paginator.getValue());
+		return index;
 	}
 
 }
