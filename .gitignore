@@ -11,7 +11,8 @@
 .settings
 .classpath
 .project
-
+#tcplocalhost
+*tcplocalhost*
 # The following files are generated/updated by vaadin-maven-plugin
 node_modules/
 
