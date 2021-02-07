@@ -11,6 +11,7 @@ import javax.swing.SingleSelectionModel;
 import org.vaadin.klaudeta.PaginatedGrid;
 
 import com.example.tControl.pojo.Employee;
+import com.example.tControl.pojo.PastEmployees;
 import com.vaadin.componentfactory.lookupfield.LookupField;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
@@ -39,25 +40,24 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Employees List")
 @CssImport("./styles/views/employees/employees.css")
 @Tag(value = "d2")
-public class EmployeesList extends VerticalLayout {
+
+public class Archive extends VerticalLayout {
 	private Select<Integer> paginator;
-	private PaginatedGrid<Employee> gridPaginatedEmployees;
-	//private GridSelectionModel<Employee> m;
-	private List<Employee> l;
-	Employee e5 = null;
+	private PaginatedGrid<PastEmployees> gridPaginatedEmployees;
+	private List<PastEmployees> l;
+	PastEmployees e5 = null;
 	
 	
-	
-	
-	public EmployeesList() {
-		l = new ArrayList<Employee>();
+
+	public Archive() {
+		l = new ArrayList<PastEmployees>();
 		for (int i = 0; i < 70; i++) {
 			if (i==59) {
-				Employee e = new Employee(new Integer(i).toString(),"Сидоров Вася Чепухов", "111111111", "Страхование", "Повар");
+				PastEmployees e = new PastEmployees("20.01.2020","Сидоров Вася Чепухов", "111111111", "37.7", "Точка_1");
 				l.add(e);
 				e5 = e;
 			} else {
-				Employee e = new Employee(new Integer(i).toString(),"Петров Илья Чепухов", "456123258", "Страхование", "Повар");
+				PastEmployees e = new PastEmployees(new Integer(i).toString(),"Петров Илья Чепухов", "456123258", "Страхование", "Повар");
 				l.add(e);
 			
 			}
@@ -65,7 +65,7 @@ public class EmployeesList extends VerticalLayout {
 		HorizontalLayout searchLayout = new HorizontalLayout();
 		searchLayout.setClassName("searchMargin");
 		
-		LookupField<Employee> lookupField = new LookupField<>();
+		LookupField<PastEmployees> lookupField = new LookupField<>();
 
 		for (Iterator<Component> i = lookupField.getChildren().iterator();i.hasNext();) {
 			Component com = i.next();
@@ -133,11 +133,11 @@ public class EmployeesList extends VerticalLayout {
 		
 		
 		gridPaginatedEmployees = new PaginatedGrid<>();
-		gridPaginatedEmployees.addColumn(Employee::getPersonnelNumber).setHeader("Personnel Number").setSortable(true);
-		gridPaginatedEmployees.addColumn(Employee::getFio)			  .setHeader("Fio").setSortable(true);
-		gridPaginatedEmployees.addColumn(Employee::getIdCard)  		  .setHeader("ID Card").setSortable(true);
-		gridPaginatedEmployees.addColumn(Employee::getDivision)       .setHeader("Division").setSortable(true);
-		gridPaginatedEmployees.addColumn(Employee::getPosition)       .setHeader("Position").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getDateTimePass).setHeader("Personnel Number").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getFio)			  .setHeader("Fio").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getIdCard)  		  .setHeader("ID Card").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getTC)       .setHeader("Division").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getPassage)       .setHeader("Position").setSortable(true);
 		gridPaginatedEmployees.setSizeFull();
 		gridPaginatedEmployees.setHeight("74%");
 		gridPaginatedEmployees.setDataProvider(DataProvider.ofCollection(l));
@@ -175,6 +175,8 @@ public class EmployeesList extends VerticalLayout {
 		i.add(paginator);
 	
 		add(searchLayout, searchedLayout, gridPaginatedEmployees, i);
+		
+		gridPaginatedEmployees.getDataProvider().withConfigurableFilter();
 		
 	}
 	private void selectRow(Employee employee) {
@@ -230,10 +232,7 @@ public class EmployeesList extends VerticalLayout {
 	private int getINdex(Employee employee) {
 		int index = 0;
 		//index = l.indexOf(employee);
-		List<Employee> items = gridPaginatedEmployees.getDataProvider()
-                .fetch(new Query<>())
-                .collect(Collectors.toList());
-		index = items.indexOf(employee);
+		
 		
 //		gridPaginatedEmployees.setPageSize(l.size());
 //		ListDataProvider listDataProvider = (ListDataProvider) gridPaginatedEmployees.getDataProvider();

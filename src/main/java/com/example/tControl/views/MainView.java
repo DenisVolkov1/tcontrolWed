@@ -83,17 +83,6 @@ public class MainView extends AppLayout {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.add(new DrawerToggle());
         viewTitle = new H1();
-       // HorizontalLayout layout2 = new HorizontalLayout();
-       // layout2.setAlignItems(Alignment.END);
-//        date = new H1("21.01.2021");
-//        date.getStyle().set("margin-left", "auto");
-//        date.getStyle().set("margin-right", "20px");
-//        time = new H1("20:29");
-//        andDateDeamonThread = new TimeAndDateDeamonThread();
-//        andDateDeamonThread.start();
-       // time.getStyle().set("margin-left", "auto");
-        //time.getStyle().set("margin-right", "20px");
-      //  layout2.add(time,date);
         layout.add(viewTitle);
         //layout.add(new Avatar());
         return layout;
@@ -125,7 +114,7 @@ public class MainView extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[]{createTab("Desktop", Desktop.class), createTab("Employees List", EmployeesList.class)};
+        return new Tab[]{createTab("Desktop", Desktop.class), createTab("Employees List", EmployeesList.class), createTab("Archive", Archive.class)};
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
