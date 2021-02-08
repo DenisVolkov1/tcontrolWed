@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.communication.PushMode;
 
 
-@Push(PushMode.MANUAL)
+//@Push(PushMode.MANUAL)
 @Route("pushVerticalLayout")
 public class PushVerticalLayout extends VerticalLayout{
 

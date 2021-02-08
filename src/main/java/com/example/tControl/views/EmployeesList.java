@@ -10,6 +10,7 @@ import javax.swing.SingleSelectionModel;
 
 import org.vaadin.klaudeta.PaginatedGrid;
 
+import com.example.tControl.pojo.DataArrayExamples;
 import com.example.tControl.pojo.Employee;
 import com.vaadin.componentfactory.lookupfield.LookupField;
 import com.vaadin.flow.component.Component;
@@ -47,21 +48,9 @@ public class EmployeesList extends VerticalLayout {
 	Employee e5 = null;
 	
 	
-	
-	
 	public EmployeesList() {
-		l = new ArrayList<Employee>();
-		for (int i = 0; i < 70; i++) {
-			if (i==59) {
-				Employee e = new Employee(new Integer(i).toString(),"Сидоров Вася Чепухов", "111111111", "Страхование", "Повар");
-				l.add(e);
-				e5 = e;
-			} else {
-				Employee e = new Employee(new Integer(i).toString(),"Петров Илья Чепухов", "456123258", "Страхование", "Повар");
-				l.add(e);
-			
-			}
-		}
+		l = new ArrayList<Employee>(DataArrayExamples.getArrayListEmployees());
+		
 		HorizontalLayout searchLayout = new HorizontalLayout();
 		searchLayout.setClassName("searchMargin");
 		
@@ -76,7 +65,6 @@ public class EmployeesList extends VerticalLayout {
 		}
 		
 		
-			
 		lookupField.setWidth("390px");
         lookupField.setDataProvider(DataProvider.ofCollection(l));
         lookupField.getGrid().addColumn(s -> s).setHeader("item");

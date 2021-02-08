@@ -1,5 +1,6 @@
 package com.example.tControl.views;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -10,6 +11,7 @@ import javax.swing.SingleSelectionModel;
 
 import org.vaadin.klaudeta.PaginatedGrid;
 
+import com.example.tControl.pojo.DataArrayExamples;
 import com.example.tControl.pojo.Employee;
 import com.example.tControl.pojo.PastEmployees;
 import com.vaadin.componentfactory.lookupfield.LookupField;
@@ -18,14 +20,17 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridSelectionModel;
 import com.vaadin.flow.component.grid.GridSingleSelectionModel;
+import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.ListBox;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -33,35 +38,80 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.Query;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = "employeesList", layout = MainView.class)
-@PageTitle("Employees List")
-@CssImport("./styles/views/employees/employees.css")
-@Tag(value = "d2")
+@Route(value = "archive", layout = MainView.class)
+@PageTitle("Archive")
+@CssImport("./styles/views/archive/archive.css")
+@Tag(value = "d3")
 
 public class Archive extends VerticalLayout {
 	private Select<Integer> paginator;
 	private PaginatedGrid<PastEmployees> gridPaginatedEmployees;
 	private List<PastEmployees> l;
 	PastEmployees e5 = null;
+	//
+	TextField timeOt;
+	DatePicker datePickerOt;
+	TextField timeDo;
+	DatePicker datePickerDo;
+	TextField idCardSearch;
 	
-	
-
 	public Archive() {
-		l = new ArrayList<PastEmployees>();
-		for (int i = 0; i < 70; i++) {
-			if (i==59) {
-				PastEmployees e = new PastEmployees("20.01.2020","Сидоров Вася Чепухов", "111111111", "37.7", "Точка_1");
-				l.add(e);
-				e5 = e;
-			} else {
-				PastEmployees e = new PastEmployees(new Integer(i).toString(),"Петров Илья Чепухов", "456123258", "Страхование", "Повар");
-				l.add(e);
-			
+		l = new ArrayList<PastEmployees>(DataArrayExamples.getArrayListPastEmployees());
+
+		HorizontalLayout dateTimeSearchLayout = new HorizontalLayout();
+		dateTimeSearchLayout.setWidth("450px");
+		dateTimeSearchLayout.getStyle().set("margin-left", "15px");
+		
+
+		H5 ot = new H5("От");
+		ot.setHeight("50px");
+		
+		VerticalLayout otLayout = new VerticalLayout();
+		otLayout.setSpacing(false);
+		
+		timeOt = new TextField();
+		timeOt.setWidth("63px");
+		
+		timeOt.setValueChangeMode(ValueChangeMode.EAGER);
+		timeOt.setPattern("\\d{2}");
+	
+		timeOt.addValueChangeListener(event -> {
+			//Notification.show(event.getValue());
+			if(!event.getValue().matches("\\d{2}")) {
+				timeOt.setValue(event.getOldValue());
 			}
-		}
+
+			
+		});
+		
+		datePickerOt = new DatePicker();
+		datePickerOt.getStyle().set("margin-top", "8px");
+		datePickerOt.setValue(LocalDate.now());
+		datePickerOt.setClearButtonVisible(true);
+		otLayout.add(timeOt, datePickerOt);
+		
+		H5 doO = new H5("До");
+		doO.setHeight("50px");
+		
+		VerticalLayout doLayout = new VerticalLayout();
+		doLayout.setSpacing(false);
+		timeDo = new TextField();
+		timeDo.setWidth("63px");
+		datePickerDo = new DatePicker();
+		datePickerDo.getStyle().set("margin-top", "8px");
+		datePickerDo.setValue(LocalDate.now());
+		datePickerDo.setClearButtonVisible(true);
+		doLayout.add(timeDo, datePickerDo);
+		
+		Button searchDateTimeButton = new Button(new Icon(VaadinIcon.SEARCH));
+		searchDateTimeButton.getStyle().set("margin-top", "18px");
+		
+		dateTimeSearchLayout.add(ot, otLayout, doO, doLayout, searchDateTimeButton);
+		
 		HorizontalLayout searchLayout = new HorizontalLayout();
 		searchLayout.setClassName("searchMargin");
 		
@@ -75,16 +125,13 @@ public class Archive extends VerticalLayout {
 			
 		}
 		
-		
-			
 		lookupField.setWidth("390px");
         lookupField.setDataProvider(DataProvider.ofCollection(l));
         lookupField.getGrid().addColumn(s -> s).setHeader("item");
-        lookupField.setLabel("Поиск");
         
         HorizontalLayout searchidCardLayout = new HorizontalLayout();
         searchidCardLayout.setSpacing(false);
-        searchidCardLayout.getStyle().set("margin-top", "34px");
+        //searchidCardLayout.getStyle().set("margin-top", "4px");
         
         TextField idCardSearch = new TextField();
         idCardSearch.setWidth("300px");
@@ -96,73 +143,64 @@ public class Archive extends VerticalLayout {
     
         searchidCardLayout.add(idCardSearch, searchIdButton);
      
-		
 		searchLayout.add(lookupField, searchidCardLayout);
 		
-		HorizontalLayout searchedLayout = new HorizontalLayout();
-		searchedLayout.setClassName("searchMargin");
+//		HorizontalLayout searchedLayout = new HorizontalLayout();
+//		searchedLayout.setClassName("searchMargin");
 		
-		TextField searchedPrsonalNumber = new TextField();
-			searchedPrsonalNumber.setLabel("№");
-			searchedPrsonalNumber.setWidth("6%");
-		TextField searchedFIO = new TextField();
-			searchedFIO.setLabel("Ф.И.О.");
-			searchedFIO.setWidth("20%");
-		TextField searchedIdCard = new TextField();
-			searchedIdCard.setLabel("ID карты");
-			searchedIdCard.setWidth("10%");
-		TextField searchedDivision = new TextField();
-			searchedDivision.setLabel("Подразделение");
-			searchedDivision.setWidth("10%");
-		TextField searchedPosition = new TextField();
-			searchedPosition.setLabel("Должность");
-			searchedPosition.setWidth("10%");
-		Button rollUpSearch = new Button(new Icon(VaadinIcon.ARROW_UP));
-		rollUpSearch.getStyle().set("margin-top", "36px");
+//		TextField searchedPrsonalNumber = new TextField();
+//			searchedPrsonalNumber.setLabel("№");
+//			searchedPrsonalNumber.setWidth("6%");
+//		TextField searchedFIO = new TextField();
+//			searchedFIO.setLabel("Ф.И.О.");
+//			searchedFIO.setWidth("20%");
+//		TextField searchedIdCard = new TextField();
+//			searchedIdCard.setLabel("ID карты");
+//			searchedIdCard.setWidth("10%");
+//		TextField searchedDivision = new TextField();
+//			searchedDivision.setLabel("Подразделение");
+//			searchedDivision.setWidth("10%");
+//		TextField searchedPosition = new TextField();
+//			searchedPosition.setLabel("Должность");
+//			searchedPosition.setWidth("10%");
+//		Button rollUpSearch = new Button(new Icon(VaadinIcon.ARROW_UP));
+//		rollUpSearch.getStyle().set("margin-top", "36px");
 	
-		searchedLayout.add(searchedPrsonalNumber, searchedFIO, searchedIdCard, searchedDivision, searchedPosition, rollUpSearch);
-		searchedLayout.setVisible(false);
-		searchedLayout.setEnabled(false);
+		//searchedLayout.add(searchedPrsonalNumber, searchedFIO, searchedIdCard, searchedDivision, searchedPosition, rollUpSearch);
+		//searchedLayout.setVisible(false);
+		//searchedLayout.setEnabled(false);
 		
-		rollUpSearch.addClickListener(event -> {
-			searchedLayout.setEnabled(false);
-			searchedLayout.setVisible(false);
-				searchLayout.setEnabled(true);
-				searchLayout.setVisible(true);
-		});
+		//rollUpSearch.addClickListener(event -> {
+//			searchedLayout.setEnabled(false);
+//			searchedLayout.setVisible(false);
+//				searchLayout.setEnabled(true);
+//				searchLayout.setVisible(true);
+//		});
 		
 		
 		gridPaginatedEmployees = new PaginatedGrid<>();
-		gridPaginatedEmployees.addColumn(PastEmployees::getDateTimePass).setHeader("Personnel Number").setSortable(true);
-		gridPaginatedEmployees.addColumn(PastEmployees::getFio)			  .setHeader("Fio").setSortable(true);
-		gridPaginatedEmployees.addColumn(PastEmployees::getIdCard)  		  .setHeader("ID Card").setSortable(true);
-		gridPaginatedEmployees.addColumn(PastEmployees::getTC)       .setHeader("Division").setSortable(true);
-		gridPaginatedEmployees.addColumn(PastEmployees::getPassage)       .setHeader("Position").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getDateTimePass).setHeader("Дата и время").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getFio)			  .setHeader("Фамилия Имя Отчество").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getIdCard)  		  .setHeader("ID Карты").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getTC)       .setHeader("Подразделение").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getPassage)       .setHeader("Должность").setSortable(true);
 		gridPaginatedEmployees.setSizeFull();
-		gridPaginatedEmployees.setHeight("74%");
+		gridPaginatedEmployees.setHeight("60%");
 		gridPaginatedEmployees.setDataProvider(DataProvider.ofCollection(l));
-		// Sets the max number of items to be rendered on the grid for each page
 		gridPaginatedEmployees.setPageSize(20);
 		gridPaginatedEmployees.setSelectionMode(SelectionMode.SINGLE); 
-		//m  =  gridPaginatedEmployees.getSelectionModel();
-		// Sets how many pages should be visible on the pagination before and/or after the current selected page
+
 		gridPaginatedEmployees.setPaginatorSize(5);
-		//l2.add(gridPaginatedEmployees);
-		//l2.getStyle().set("overflow", "auto");
-		//l2.setHeight("650px");
-		//gridPaginatedEmployees.scrollToIndex(50);
+
 		searchIdButton.addClickListener(event -> {
-			searchLayout.setEnabled(false);
-			searchLayout.setVisible(false);
-				searchedLayout.setEnabled(true);
-				searchedLayout.setVisible(true);
+	
 
 			
 		});
 		
-		HorizontalLayout i = new HorizontalLayout();
-		i.getStyle().set("margin-right", "20px");
-		i.setAlignItems(Alignment.START);		
+		HorizontalLayout paginatorLayout = new HorizontalLayout();
+		paginatorLayout.getStyle().set("margin-right", "20px");
+		paginatorLayout.setAlignItems(Alignment.START);		
 		paginator = new Select<>();
 		paginator.addValueChangeListener(event -> {
 			gridPaginatedEmployees.setPageSize(event.getValue());
@@ -172,10 +210,10 @@ public class Archive extends VerticalLayout {
 		paginator.setClassName("pagination");
 		paginator.setItems(20, 30, 50);
 		paginator.setValue(20);
-		i.add(paginator);
+		paginatorLayout.add(paginator);
 	
-		add(searchLayout, searchedLayout, gridPaginatedEmployees, i);
-		
+		add(dateTimeSearchLayout, searchLayout, gridPaginatedEmployees, paginatorLayout);
+		setSpacing(true);
 		gridPaginatedEmployees.getDataProvider().withConfigurableFilter();
 		
 	}
