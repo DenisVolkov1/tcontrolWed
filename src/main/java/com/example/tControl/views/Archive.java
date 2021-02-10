@@ -16,6 +16,7 @@ import com.example.tControl.pojo.Employee;
 import com.example.tControl.pojo.PastEmployees;
 import com.vaadin.componentfactory.lookupfield.LookupField;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -29,6 +30,7 @@ import com.vaadin.flow.component.grid.GridSingleSelectionModel;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.internal.KeyboardEvent;
 import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -45,6 +47,7 @@ import com.vaadin.flow.router.Route;
 @Route(value = "archive", layout = MainView.class)
 @PageTitle("Archive")
 @CssImport("./styles/views/archive/archive.css")
+@CssImport(value="./styles/displayblock.css", themeFor="vaadin-text-field" )
 @Tag(value = "d3")
 
 public class Archive extends VerticalLayout {
@@ -53,9 +56,12 @@ public class Archive extends VerticalLayout {
 	private List<PastEmployees> l;
 	PastEmployees e5 = null;
 	//
-	TextField timeOt;
+	TextField hoursTimeOt;
+	TextField minutesTimeOt;
+	TextField hoursTimeDo;
+	TextField minutesTimeDo;
+	
 	DatePicker datePickerOt;
-	TextField timeDo;
 	DatePicker datePickerDo;
 	TextField idCardSearch;
 	
@@ -73,39 +79,67 @@ public class Archive extends VerticalLayout {
 		VerticalLayout otLayout = new VerticalLayout();
 		otLayout.setSpacing(false);
 		
-		timeOt = new TextField();
-		timeOt.setWidth("63px");
+		HorizontalLayout timeOtLayout = new HorizontalLayout();
+		timeOtLayout.setAlignItems(Alignment.CENTER);
+		timeOtLayout.setSpacing(false);
 		
-		timeOt.setValueChangeMode(ValueChangeMode.EAGER);
-		timeOt.setPattern("\\d{2}");
-	
-		timeOt.addValueChangeListener(event -> {
-			//Notification.show(event.getValue());
-			if(!event.getValue().matches("\\d{2}")) {
-				timeOt.setValue(event.getOldValue());
-			}
-
-			
-		});
+		hoursTimeOt = new TextField();
+		hoursTimeOt.setClassName("display-block");
+		hoursTimeOt.getStyle().set("margin-right", "5px");
+		hoursTimeOt.setWidth("40px");
+		hoursTimeOt.setValueChangeMode(ValueChangeMode.EAGER);
+		
+		H5 razdelOt = new H5(":");
+		razdelOt.getStyle().set("margin-bottom", "20px");
+		
+		minutesTimeOt = new TextField();
+		minutesTimeOt.setClassName("display-block");
+		minutesTimeOt.getStyle().set("margin-left", "5px");
+		minutesTimeOt.setWidth("40px");
+		minutesTimeOt.setValueChangeMode(ValueChangeMode.EAGER);
+		
+		timeOtLayout.add(hoursTimeOt,razdelOt,minutesTimeOt);
+		
 		
 		datePickerOt = new DatePicker();
 		datePickerOt.getStyle().set("margin-top", "8px");
 		datePickerOt.setValue(LocalDate.now());
 		datePickerOt.setClearButtonVisible(true);
-		otLayout.add(timeOt, datePickerOt);
+		otLayout.add(timeOtLayout, datePickerOt);
 		
 		H5 doO = new H5("До");
 		doO.setHeight("50px");
 		
 		VerticalLayout doLayout = new VerticalLayout();
 		doLayout.setSpacing(false);
-		timeDo = new TextField();
-		timeDo.setWidth("63px");
+		
+		HorizontalLayout timeDoLayout = new HorizontalLayout();
+		timeDoLayout.setAlignItems(Alignment.CENTER);
+		timeDoLayout.setSpacing(false);
+		
+		hoursTimeDo = new TextField();
+		hoursTimeDo.setClassName("display-block");
+		hoursTimeDo.getStyle().set("margin-right", "5px");
+		hoursTimeDo.setWidth("40px");
+		hoursTimeDo.setValueChangeMode(ValueChangeMode.EAGER);
+		
+		H5 razdelDo = new H5(":");
+		razdelDo.getStyle().set("margin-bottom", "20px");
+		
+		minutesTimeDo = new TextField();
+		minutesTimeDo.setClassName("display-block");
+		minutesTimeDo.getStyle().set("margin-left", "5px");
+		minutesTimeDo.setWidth("40px");
+		minutesTimeDo.setValueChangeMode(ValueChangeMode.EAGER);
+		
+		timeDoLayout.add(hoursTimeDo,razdelDo,minutesTimeDo);
+		
+		
 		datePickerDo = new DatePicker();
 		datePickerDo.getStyle().set("margin-top", "8px");
 		datePickerDo.setValue(LocalDate.now());
 		datePickerDo.setClearButtonVisible(true);
-		doLayout.add(timeDo, datePickerDo);
+		doLayout.add(timeDoLayout, datePickerDo);
 		
 		Button searchDateTimeButton = new Button(new Icon(VaadinIcon.SEARCH));
 		searchDateTimeButton.getStyle().set("margin-top", "18px");
@@ -145,37 +179,6 @@ public class Archive extends VerticalLayout {
      
 		searchLayout.add(lookupField, searchidCardLayout);
 		
-//		HorizontalLayout searchedLayout = new HorizontalLayout();
-//		searchedLayout.setClassName("searchMargin");
-		
-//		TextField searchedPrsonalNumber = new TextField();
-//			searchedPrsonalNumber.setLabel("№");
-//			searchedPrsonalNumber.setWidth("6%");
-//		TextField searchedFIO = new TextField();
-//			searchedFIO.setLabel("Ф.И.О.");
-//			searchedFIO.setWidth("20%");
-//		TextField searchedIdCard = new TextField();
-//			searchedIdCard.setLabel("ID карты");
-//			searchedIdCard.setWidth("10%");
-//		TextField searchedDivision = new TextField();
-//			searchedDivision.setLabel("Подразделение");
-//			searchedDivision.setWidth("10%");
-//		TextField searchedPosition = new TextField();
-//			searchedPosition.setLabel("Должность");
-//			searchedPosition.setWidth("10%");
-//		Button rollUpSearch = new Button(new Icon(VaadinIcon.ARROW_UP));
-//		rollUpSearch.getStyle().set("margin-top", "36px");
-	
-		//searchedLayout.add(searchedPrsonalNumber, searchedFIO, searchedIdCard, searchedDivision, searchedPosition, rollUpSearch);
-		//searchedLayout.setVisible(false);
-		//searchedLayout.setEnabled(false);
-		
-		//rollUpSearch.addClickListener(event -> {
-//			searchedLayout.setEnabled(false);
-//			searchedLayout.setVisible(false);
-//				searchLayout.setEnabled(true);
-//				searchLayout.setVisible(true);
-//		});
 		
 		
 		gridPaginatedEmployees = new PaginatedGrid<>();
@@ -216,7 +219,55 @@ public class Archive extends VerticalLayout {
 		setSpacing(true);
 		gridPaginatedEmployees.getDataProvider().withConfigurableFilter();
 		
+		//ADD-LISTENERS ///////////////////////////////////
+		hoursTimeOt.addValueChangeListener(event -> {
+//			System.out.println("values "+event.getValue());
+//			System.out.println("Old values "+event.getOldValue());
+			//
+			if (event.getValue().length() == 1) {
+				if (!(event.getValue().matches("[012]"))) {
+					if (event.getValue().length() > event.getOldValue().length()) hoursTimeOt.setValue(event.getOldValue());
+				}
+			} else if (event.getValue().length() == 2) {
+				if (!(event.getValue().matches("\\d+") && Integer.parseInt(event.getValue()) <= 23)) {
+					hoursTimeOt.setValue(event.getOldValue());
+				}
+			}
+		});
+		hoursTimeOt.addBlurListener(event-> {
+			System.out.println(hoursTimeOt.getValue().length());
+			if (hoursTimeOt.getValue().length() == 1) {
+				hoursTimeOt.setValue("0"+hoursTimeOt.getValue());
+			}
+			
+		});
+		minutesTimeOt.addValueChangeListener(event -> {
+			if (event.getValue().length() == 1) {
+				if (!(event.getValue().matches("[012345]"))) {
+					if (event.getValue().length() > event.getOldValue().length()) hoursTimeOt.setValue(event.getOldValue());
+				}
+			} else if (event.getValue().length() == 2) {
+				if (!(event.getValue().matches("\\d+") && Integer.parseInt(event.getValue()) <= 59)) {
+					hoursTimeOt.setValue(event.getOldValue());
+				}
+			}
+		});
+		minutesTimeOt.addBlurListener(event-> {
+			System.out.println(hoursTimeOt.getValue().length());
+			if (hoursTimeOt.getValue().length() == 1) {
+				hoursTimeOt.setValue("0"+hoursTimeOt.getValue());
+			}
+		});
+		hoursTimeDo.addValueChangeListener(event -> {
+			
+		});
+		minutesTimeDo.addValueChangeListener(event -> {
+			
+		});
+		
 	}
+	
+	
 	private void selectRow(Employee employee) {
 
 	
