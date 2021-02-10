@@ -1,0 +1,3 @@
+:host(.display-block) [part="input-field"] {
+	display: block;
+}
