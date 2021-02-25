@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.swing.SingleSelectionModel;
 
 import org.vaadin.klaudeta.PaginatedGrid;
 
+import com.example.tControl.component.TimeInputter;
 import com.example.tControl.pojo.DataArrayExamples;
 import com.example.tControl.pojo.Employee;
 import com.example.tControl.pojo.PastEmployees;
@@ -54,15 +56,16 @@ public class Archive extends VerticalLayout {
 	private Select<Integer> paginator;
 	private PaginatedGrid<PastEmployees> gridPaginatedEmployees;
 	private List<PastEmployees> l;
+	private Button downloadingReport;
 	PastEmployees e5 = null;
 	//
-	TextField hoursTimeOt;
-	TextField minutesTimeOt;
-	TextField hoursTimeDo;
-	TextField minutesTimeDo;
+
+	TimeInputter timeOt;
+	TimeInputter timeDo;
 	
 	DatePicker datePickerOt;
 	DatePicker datePickerDo;
+	Button searchDateTimeButton;
 	TextField idCardSearch;
 	
 	public Archive() {
@@ -79,33 +82,14 @@ public class Archive extends VerticalLayout {
 		VerticalLayout otLayout = new VerticalLayout();
 		otLayout.setSpacing(false);
 		
-		HorizontalLayout timeOtLayout = new HorizontalLayout();
-		timeOtLayout.setAlignItems(Alignment.CENTER);
-		timeOtLayout.setSpacing(false);
-		
-		hoursTimeOt = new TextField();
-		hoursTimeOt.setClassName("display-block");
-		hoursTimeOt.getStyle().set("margin-right", "5px");
-		hoursTimeOt.setWidth("40px");
-		hoursTimeOt.setValueChangeMode(ValueChangeMode.EAGER);
-		
-		H5 razdelOt = new H5(":");
-		razdelOt.getStyle().set("margin-bottom", "20px");
-		
-		minutesTimeOt = new TextField();
-		minutesTimeOt.setClassName("display-block");
-		minutesTimeOt.getStyle().set("margin-left", "5px");
-		minutesTimeOt.setWidth("40px");
-		minutesTimeOt.setValueChangeMode(ValueChangeMode.EAGER);
-		
-		timeOtLayout.add(hoursTimeOt,razdelOt,minutesTimeOt);
-		
-		
 		datePickerOt = new DatePicker();
 		datePickerOt.getStyle().set("margin-top", "8px");
+		datePickerOt.setLocale(new Locale("ru"));
 		datePickerOt.setValue(LocalDate.now());
 		datePickerOt.setClearButtonVisible(true);
-		otLayout.add(timeOtLayout, datePickerOt);
+		
+		timeOt = new TimeInputter();
+		otLayout.add(timeOt, datePickerOt);
 		
 		H5 doO = new H5("До");
 		doO.setHeight("50px");
@@ -113,35 +97,16 @@ public class Archive extends VerticalLayout {
 		VerticalLayout doLayout = new VerticalLayout();
 		doLayout.setSpacing(false);
 		
-		HorizontalLayout timeDoLayout = new HorizontalLayout();
-		timeDoLayout.setAlignItems(Alignment.CENTER);
-		timeDoLayout.setSpacing(false);
-		
-		hoursTimeDo = new TextField();
-		hoursTimeDo.setClassName("display-block");
-		hoursTimeDo.getStyle().set("margin-right", "5px");
-		hoursTimeDo.setWidth("40px");
-		hoursTimeDo.setValueChangeMode(ValueChangeMode.EAGER);
-		
-		H5 razdelDo = new H5(":");
-		razdelDo.getStyle().set("margin-bottom", "20px");
-		
-		minutesTimeDo = new TextField();
-		minutesTimeDo.setClassName("display-block");
-		minutesTimeDo.getStyle().set("margin-left", "5px");
-		minutesTimeDo.setWidth("40px");
-		minutesTimeDo.setValueChangeMode(ValueChangeMode.EAGER);
-		
-		timeDoLayout.add(hoursTimeDo,razdelDo,minutesTimeDo);
-		
-		
 		datePickerDo = new DatePicker();
 		datePickerDo.getStyle().set("margin-top", "8px");
+		datePickerDo.setLocale(new Locale("ru"));
 		datePickerDo.setValue(LocalDate.now());
 		datePickerDo.setClearButtonVisible(true);
-		doLayout.add(timeDoLayout, datePickerDo);
 		
-		Button searchDateTimeButton = new Button(new Icon(VaadinIcon.SEARCH));
+		timeDo = new TimeInputter();
+		doLayout.add(timeDo, datePickerDo);
+		
+		searchDateTimeButton = new Button(new Icon(VaadinIcon.SEARCH));
 		searchDateTimeButton.getStyle().set("margin-top", "18px");
 		
 		dateTimeSearchLayout.add(ot, otLayout, doO, doLayout, searchDateTimeButton);
@@ -161,11 +126,10 @@ public class Archive extends VerticalLayout {
 		
 		lookupField.setWidth("390px");
         lookupField.setDataProvider(DataProvider.ofCollection(l));
-        lookupField.getGrid().addColumn(s -> s).setHeader("item");
+       
         
         HorizontalLayout searchidCardLayout = new HorizontalLayout();
         searchidCardLayout.setSpacing(false);
-        //searchidCardLayout.getStyle().set("margin-top", "4px");
         
         TextField idCardSearch = new TextField();
         idCardSearch.setWidth("300px");
@@ -178,7 +142,6 @@ public class Archive extends VerticalLayout {
         searchidCardLayout.add(idCardSearch, searchIdButton);
      
 		searchLayout.add(lookupField, searchidCardLayout);
-		
 		
 		
 		gridPaginatedEmployees = new PaginatedGrid<>();
@@ -202,68 +165,43 @@ public class Archive extends VerticalLayout {
 		});
 		
 		HorizontalLayout paginatorLayout = new HorizontalLayout();
-		paginatorLayout.getStyle().set("margin-right", "20px");
-		paginatorLayout.setAlignItems(Alignment.START);		
+		paginatorLayout.setWidthFull();
+		//paginatorLayout.getStyle().set("margin-right", "20px");
+		//paginatorLayout.setAlignItems(Alignment.START);		
 		paginator = new Select<>();
-		paginator.addValueChangeListener(event -> {
-			gridPaginatedEmployees.setPageSize(event.getValue());
 
-		});
 		paginator.setWidth("80px");
 		paginator.setClassName("pagination");
 		paginator.setItems(20, 30, 50);
 		paginator.setValue(20);
-		paginatorLayout.add(paginator);
+		
+		downloadingReport = new Button("Скачать отчёт");
+		downloadingReport.setWidth("190px");
+		
+		paginatorLayout.add(downloadingReport,paginator);
 	
 		add(dateTimeSearchLayout, searchLayout, gridPaginatedEmployees, paginatorLayout);
 		setSpacing(true);
 		gridPaginatedEmployees.getDataProvider().withConfigurableFilter();
 		
 		//ADD-LISTENERS ///////////////////////////////////
-		hoursTimeOt.addValueChangeListener(event -> {
-//			System.out.println("values "+event.getValue());
-//			System.out.println("Old values "+event.getOldValue());
-			//
-			if (event.getValue().length() == 1) {
-				if (!(event.getValue().matches("[012]"))) {
-					if (event.getValue().length() > event.getOldValue().length()) hoursTimeOt.setValue(event.getOldValue());
-				}
-			} else if (event.getValue().length() == 2) {
-				if (!(event.getValue().matches("\\d+") && Integer.parseInt(event.getValue()) <= 23)) {
-					hoursTimeOt.setValue(event.getOldValue());
-				}
-			}
+		paginator.addValueChangeListener(event -> {
+			gridPaginatedEmployees.setPageSize(event.getValue());
+
 		});
-		hoursTimeOt.addBlurListener(event-> {
-			System.out.println(hoursTimeOt.getValue().length());
-			if (hoursTimeOt.getValue().length() == 1) {
-				hoursTimeOt.setValue("0"+hoursTimeOt.getValue());
-			}
+		lookupField.getGrid().addColumn(s -> s).setHeader("item");
+		
+		searchDateTimeButton.addClickListener(event -> {
+			if(timeOt.isEmptyHours()) timeOt.setHours(0);
+			if(timeOt.isEmptyMinutes()) timeOt.setMinutes(0);
 			
-		});
-		minutesTimeOt.addValueChangeListener(event -> {
-			if (event.getValue().length() == 1) {
-				if (!(event.getValue().matches("[012345]"))) {
-					if (event.getValue().length() > event.getOldValue().length()) hoursTimeOt.setValue(event.getOldValue());
-				}
-			} else if (event.getValue().length() == 2) {
-				if (!(event.getValue().matches("\\d+") && Integer.parseInt(event.getValue()) <= 59)) {
-					hoursTimeOt.setValue(event.getOldValue());
-				}
-			}
-		});
-		minutesTimeOt.addBlurListener(event-> {
-			System.out.println(hoursTimeOt.getValue().length());
-			if (hoursTimeOt.getValue().length() == 1) {
-				hoursTimeOt.setValue("0"+hoursTimeOt.getValue());
-			}
-		});
-		hoursTimeDo.addValueChangeListener(event -> {
+			if(timeDo.isEmptyHours()) timeDo.setHours(0);
+			if(timeDo.isEmptyMinutes()) timeDo.setMinutes(0);
 			
+			System.out.println("time ot " + timeOt);
+			System.out.println("time do " + timeDo);
 		});
-		minutesTimeDo.addValueChangeListener(event -> {
-			
-		});
+
 		
 	}
 	

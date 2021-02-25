@@ -32,12 +32,14 @@ import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.router.RouterLayout;
 
 
 @Route(value = "desktop", layout = MainView.class)
+//@PreserveOnRefresh
 @PageTitle("Desktop")
 @CssImport("./styles/views/desktop/desktop.css")
 @RouteAlias(value = "", layout = MainView.class)
@@ -48,16 +50,11 @@ public class Desktop extends VerticalLayout {
 	private HorizontalLayout extendedInformation;
 	private PushVerticalLayout listBoxLayout;
 	private Button expandButton;
-	private List itemsList;
+	private static List<Component> itemsList = new ArrayList<Component>();
 	
 	public Desktop() {
 		
-		try {
-			new ClientMqtt(itemsList);
-		} catch (MqttException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
 		extendedInformation = new HorizontalLayout();
 		//extendedInformation.getStyle().set("display","block");
 		//extendedInformation.setSizeUndefined();
@@ -72,8 +69,8 @@ public class Desktop extends VerticalLayout {
 		labelExtendedInformation.add(fioExtendedInformation, divisionExtendedInformation,positionExtendedInformation ,idCardExtendedInformation,tCExtendedInformation,timeExtendedInformation);
 		
 		Image photoExtendedInformation = new Image("images/noPhoto.png", "noPhoto");
-		photoExtendedInformation.setWidth("400px");
-		photoExtendedInformation.setHeight("400px");
+		photoExtendedInformation.setWidth("220px");
+		photoExtendedInformation.setHeight("220px");
 		
 		expandButton = new Button(new Icon(VaadinIcon.ARROW_DOWN), event -> {
 			extendedInformation.setEnabled(true);
@@ -98,7 +95,7 @@ public class Desktop extends VerticalLayout {
 		
 		extendedInformation.add(labelExtendedInformation, photoExtendedInformation,rollUpButton,expandButton);
 		
-		listBoxLayout = new PushVerticalLayout();
+		listBoxLayout =  new PushVerticalLayout(itemsList);
 		
 		ListBox listBox = new ListBox<>();
 
@@ -203,11 +200,12 @@ public class Desktop extends VerticalLayout {
 	                //DateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
 	                Component layout = createMessageTemperatureComponent("images/noPhoto.png", "Бессонов Владимир Игнатьевич", "45.5",  timeFormat.format( System.currentTimeMillis()));
 	    			listBoxLayout.addWithPush(layout);
+	    			itemsList.add(layout);
 	                //time.setText(timeFormat.format( System.currentTimeMillis()));
 	               
 	                //System.out.println("time "+timeFormat.format(System.currentTimeMillis())+"date "+dateFormat.format(System.currentTimeMillis()));
 	    			  System.out.println("add comp");
-	                try {sleep(4500);} catch (InterruptedException e) {}                   	
+	                try {sleep(2500);} catch (InterruptedException e) {}                   	
 	            }
     		  } catch (Exception e) {
 				e.printStackTrace();

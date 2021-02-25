@@ -1,5 +1,9 @@
 package com.example.tControl.views;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -10,6 +14,8 @@ import javax.swing.SingleSelectionModel;
 
 import org.vaadin.klaudeta.PaginatedGrid;
 
+import com.example.tControl.base.ConnectionPool;
+import com.example.tControl.base.EmployeesListBase;
 import com.example.tControl.pojo.DataArrayExamples;
 import com.example.tControl.pojo.Employee;
 import com.vaadin.componentfactory.lookupfield.LookupField;
@@ -43,38 +49,45 @@ import com.vaadin.flow.router.Route;
 public class EmployeesList extends VerticalLayout {
 	private Select<Integer> paginator;
 	private PaginatedGrid<Employee> gridPaginatedEmployees;
-	//private GridSelectionModel<Employee> m;
+	private LookupField<Employee> lookupField;
+	private HorizontalLayout searchLayout;
+	private HorizontalLayout searchedLayout;
+	private TextField idCardSearch;
 	private List<Employee> l;
 	Employee e5 = null;
 	
 	
-	public EmployeesList() {
-		l = new ArrayList<Employee>(DataArrayExamples.getArrayListEmployees());
+	public EmployeesList() throws SQLException {
+		l = new ArrayList<Employee>(EmployeesListBase.getAll());
 		
-		HorizontalLayout searchLayout = new HorizontalLayout();
+		searchLayout = new HorizontalLayout();
 		searchLayout.setClassName("searchMargin");
 		
-		LookupField<Employee> lookupField = new LookupField<>();
-
-		for (Iterator<Component> i = lookupField.getChildren().iterator();i.hasNext();) {
-			Component com = i.next();
+		lookupField = new LookupField<>();
+        lookupField.setI18n(new LookupField.LookupFieldI18n()
+                .setSelect("Выбрать")
+                .setSearch("Поиск")
+                .setHeaderpostfix("")
+                .setCancel("Отмена"));
+        
+		for (Iterator<Component> i1 = lookupField.getChildren().iterator();i1.hasNext();) {
+			Component com = i1.next();
 			if (com.getClass().getName().equals("com.vaadin.flow.component.combobox.ComboBox")) {
 				((ComboBox)com).setPlaceholder("ФИО");
 			}
-			
 		}
-		
 		
 		lookupField.setWidth("390px");
         lookupField.setDataProvider(DataProvider.ofCollection(l));
-        lookupField.getGrid().addColumn(s -> s).setHeader("item");
+        lookupField.getGrid().addColumn(s -> s);
         lookupField.setLabel("Поиск");
+        
         
         HorizontalLayout searchidCardLayout = new HorizontalLayout();
         searchidCardLayout.setSpacing(false);
         searchidCardLayout.getStyle().set("margin-top", "34px");
         
-        TextField idCardSearch = new TextField();
+        idCardSearch = new TextField();
         idCardSearch.setWidth("300px");
         idCardSearch.setPlaceholder("ID карты");
         
@@ -87,7 +100,7 @@ public class EmployeesList extends VerticalLayout {
 		
 		searchLayout.add(lookupField, searchidCardLayout);
 		
-		HorizontalLayout searchedLayout = new HorizontalLayout();
+		searchedLayout = new HorizontalLayout();
 		searchedLayout.setClassName("searchMargin");
 		
 		TextField searchedPrsonalNumber = new TextField();
@@ -95,30 +108,22 @@ public class EmployeesList extends VerticalLayout {
 			searchedPrsonalNumber.setWidth("6%");
 		TextField searchedFIO = new TextField();
 			searchedFIO.setLabel("Ф.И.О.");
-			searchedFIO.setWidth("20%");
+			searchedFIO.setWidth("25%");
 		TextField searchedIdCard = new TextField();
 			searchedIdCard.setLabel("ID карты");
 			searchedIdCard.setWidth("10%");
 		TextField searchedDivision = new TextField();
 			searchedDivision.setLabel("Подразделение");
-			searchedDivision.setWidth("10%");
+			searchedDivision.setWidth("25%");
 		TextField searchedPosition = new TextField();
 			searchedPosition.setLabel("Должность");
-			searchedPosition.setWidth("10%");
+			searchedPosition.setWidth("25%");
 		Button rollUpSearch = new Button(new Icon(VaadinIcon.ARROW_UP));
 		rollUpSearch.getStyle().set("margin-top", "36px");
 	
 		searchedLayout.add(searchedPrsonalNumber, searchedFIO, searchedIdCard, searchedDivision, searchedPosition, rollUpSearch);
 		searchedLayout.setVisible(false);
 		searchedLayout.setEnabled(false);
-		
-		rollUpSearch.addClickListener(event -> {
-			searchedLayout.setEnabled(false);
-			searchedLayout.setVisible(false);
-				searchLayout.setEnabled(true);
-				searchLayout.setVisible(true);
-		});
-		
 		
 		gridPaginatedEmployees = new PaginatedGrid<>();
 		gridPaginatedEmployees.addColumn(Employee::getPersonnelNumber).setHeader("Personnel Number").setSortable(true);
@@ -139,32 +144,77 @@ public class EmployeesList extends VerticalLayout {
 		//l2.getStyle().set("overflow", "auto");
 		//l2.setHeight("650px");
 		//gridPaginatedEmployees.scrollToIndex(50);
-		searchIdButton.addClickListener(event -> {
-			searchLayout.setEnabled(false);
-			searchLayout.setVisible(false);
-				searchedLayout.setEnabled(true);
-				searchedLayout.setVisible(true);
 
-			
-		});
 		
-		HorizontalLayout i = new HorizontalLayout();
-		i.getStyle().set("margin-right", "20px");
-		i.setAlignItems(Alignment.START);		
+		HorizontalLayout i1 = new HorizontalLayout();
+		i1.getStyle().set("margin-right", "20px");
+		i1.setAlignItems(Alignment.START);		
 		paginator = new Select<>();
-		paginator.addValueChangeListener(event -> {
-			gridPaginatedEmployees.setPageSize(event.getValue());
-
-		});
 		paginator.setWidth("80px");
 		paginator.setClassName("pagination");
 		paginator.setItems(20, 30, 50);
 		paginator.setValue(20);
-		i.add(paginator);
+		i1.add(paginator);
+		/// ADD LISTENERS
+		lookupField.addValueChangeListener(event -> {
+			//System.out.println("cllick");
+			if (event.getValue() != null) {
+				hideLookupFields();
+					Employee e = event.getValue();
+				 searchedPrsonalNumber.setValue(e.getPersonnelNumber());
+				 searchedFIO.setValue(e.getFio());
+				 searchedIdCard.setValue(e.getIdCard());
+				 searchedDivision.setValue(e.getDivision());
+				 searchedPosition.setValue(e.getPosition());
+
+				
+			}
+		});
+		rollUpSearch.addClickListener(event -> {
+			showLookupFields();
+		});		
+		searchIdButton.addClickListener(event -> {
+			String inputIdCard = idCardSearch.getValue();
+			Employee searchedEmploee = null;
+			hideLookupFields();
+			for(Employee e : l) {
+				if(e.getIdCard().equals(inputIdCard)) {
+					searchedEmploee = e;
+					break;
+				}
+			}
+		 if(searchedEmploee != null) {
+			 searchedPrsonalNumber.setValue(searchedEmploee.getPersonnelNumber());
+			 searchedFIO.setValue(searchedEmploee.getFio());
+			 searchedIdCard.setValue(searchedEmploee.getIdCard());
+			 searchedDivision.setValue(searchedEmploee.getDivision());
+			 searchedPosition.setValue(searchedEmploee.getPosition());
+		 }
+				
+			
+		});
+		paginator.addValueChangeListener(event -> {
+			gridPaginatedEmployees.setPageSize(event.getValue());
+
+		});
+		
 	
-		add(searchLayout, searchedLayout, gridPaginatedEmployees, i);
+		add(searchLayout, searchedLayout, gridPaginatedEmployees, i1);
 		
 	}
+	private void hideLookupFields() {
+		searchLayout.setEnabled(false);
+		searchLayout.setVisible(false);
+			searchedLayout.setEnabled(true);
+			searchedLayout.setVisible(true);
+	}
+	private void showLookupFields() {
+		searchLayout.setEnabled(true);
+		searchLayout.setVisible(true);
+			searchedLayout.setEnabled(false);
+			searchedLayout.setVisible(false);
+	}
+	
 	private void selectRow(Employee employee) {
 
 	
@@ -186,31 +236,6 @@ public class EmployeesList extends VerticalLayout {
 		//gridPaginatedEmployees.refreshPaginator();
 		gridPaginatedEmployees.getSelectionModel().select(e5);
 		
-	//m.select(e5);
-		
-		
-	
-		
-		
-		//System.out.println(getINdex(employee)%paginator.getValue());
-		
-//		for (int i = 1; totalPages >= i; i++) {
-//			gridPaginatedEmployees.setPage(i);
-//			gridPaginatedEmployees.setPageSize(l.size());
-//
-//			
-//			ListDataProvider listDataProvider = (ListDataProvider) gridPaginatedEmployees.getDataProvider();
-//			ArrayList items = (new ArrayList(listDataProvider.getItems()));
-//
-//			int index = items.indexOf(e5);
-//			System.out.println(index);
-//			System.out.println(gridPaginatedEmployees.getPage());
-//			if (index != -1) {
-//				System.out.println(index);
-//
-//				break;
-//			}
-//		}
 
 
 		
@@ -223,11 +248,7 @@ public class EmployeesList extends VerticalLayout {
                 .collect(Collectors.toList());
 		index = items.indexOf(employee);
 		
-//		gridPaginatedEmployees.setPageSize(l.size());
-//		ListDataProvider listDataProvider = (ListDataProvider) gridPaginatedEmployees.getDataProvider();
-//		ArrayList items = (new ArrayList(listDataProvider.getItems()));
-//		index = items.indexOf(employee);
-//		gridPaginatedEmployees.setPageSize(paginator.getValue());
+
 		return index;
 	}
 

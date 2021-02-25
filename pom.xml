@@ -139,6 +139,20 @@
   			<artifactId>lookup-field-flow</artifactId>
    			<version>1.0.6</version>
 		</dependency>
+		
+		<dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+        </dependency>
+	    
+	    <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>8.0.22</version>
+		</dependency>
+	    
          <!-- my DEPENDENCY my DEPENDENCY  my DEPENDENCY  my DEPENDENCY  my DEPENDENCY-->
     </dependencies>
 
