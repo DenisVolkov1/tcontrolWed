@@ -1,30 +1,62 @@
 package com.example.tControl.pojo;
 
-public class PastEmployees {
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-	private String dateTime;
-	private String fio;
-	private String idCard;
-	private String tC;
-	private String passage;
+import javax.persistence.Basic;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+
+import com.example.tControl.myObject.WrapperLocalDateTime;
+
+
+@Entity
+@Table( name = "PastEmployees")
+public class PastEmployees {
 	
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy = "increment")
+    private int ID;
+    private String fio;
+    private String idCard;
+    private String tC;
+    private String passage;
+    @Basic
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime addDateTime;
+    @Transient
+	private WrapperLocalDateTime wrapperdateTime;
 	
+
 	public PastEmployees() {}
 	
-	public PastEmployees(String dateTime, String fio, String idCard, String tC, String passage) {
+	public PastEmployees(LocalDateTime addDateTime, String fio, String idCard, String tC, String passage) {
 		super();
-		this.dateTime = dateTime;
+		this.addDateTime = addDateTime;
+		this.wrapperdateTime = (addDateTime != null) ? new WrapperLocalDateTime(addDateTime) : null;
 		this.fio = fio;
 		this.idCard = idCard;
 		this.tC = tC;
 		this.passage = passage;
 	}
 	
-	public String getDateTimePass() {
-		return dateTime;
+
+	public LocalDateTime getLocalDateTime() {
+		return addDateTime;
 	}
-	public void setDateTimePass(String personnelNumber) {
-		this.dateTime = personnelNumber;
+	public void setDateTimePass(LocalDateTime dateTime) {
+		this.addDateTime = dateTime;
+	}
+	public WrapperLocalDateTime getWrapperLocalDateTime() {
+		return wrapperdateTime;
 	}
 	public String getFio() {
 		return fio;

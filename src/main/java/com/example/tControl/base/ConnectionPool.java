@@ -14,7 +14,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 public class ConnectionPool {
 	
 	 // JDBC Driver Name & Database URL  
-    static  String JDBC_DB_URL = "jdbc:mysql://localhost:3306/tcontrolbase?serverTimezone=UTC";
+    static  String JDBC_DB_URL = "jdbc:mysql://localhost:3306/tcontrolbase?useUnicode=true&serverTimezone=UTC"; ////useLegacyDatetimeCode=false";//serverTimezone=UTC";
  
     // JDBC Database Credentials
     static  String JDBC_USER = "root";

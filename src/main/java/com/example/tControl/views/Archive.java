@@ -1,6 +1,9 @@
 package com.example.tControl.views;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -12,6 +15,7 @@ import javax.swing.SingleSelectionModel;
 
 import org.vaadin.klaudeta.PaginatedGrid;
 
+import com.example.tControl.base.PastEmployeesBase;
 import com.example.tControl.component.TimeInputter;
 import com.example.tControl.pojo.DataArrayExamples;
 import com.example.tControl.pojo.Employee;
@@ -55,6 +59,7 @@ import com.vaadin.flow.router.Route;
 public class Archive extends VerticalLayout {
 	private Select<Integer> paginator;
 	private PaginatedGrid<PastEmployees> gridPaginatedEmployees;
+	private LookupField<PastEmployees> lookupField;
 	private List<PastEmployees> l;
 	private Button downloadingReport;
 	PastEmployees e5 = null;
@@ -68,8 +73,8 @@ public class Archive extends VerticalLayout {
 	Button searchDateTimeButton;
 	TextField idCardSearch;
 	
-	public Archive() {
-		l = new ArrayList<PastEmployees>(DataArrayExamples.getArrayListPastEmployees());
+	public Archive() throws SQLException {
+		l = new ArrayList<PastEmployees>(PastEmployeesBase.getAll());
 
 		HorizontalLayout dateTimeSearchLayout = new HorizontalLayout();
 		dateTimeSearchLayout.setWidth("450px");
@@ -114,7 +119,12 @@ public class Archive extends VerticalLayout {
 		HorizontalLayout searchLayout = new HorizontalLayout();
 		searchLayout.setClassName("searchMargin");
 		
-		LookupField<PastEmployees> lookupField = new LookupField<>();
+		lookupField = new LookupField<>();
+        lookupField.setI18n(new LookupField.LookupFieldI18n()
+                .setSelect("Выбрать")
+                .setSearch("Поиск")
+                .setHeaderpostfix("")
+                .setCancel("Отмена"));
 
 		for (Iterator<Component> i = lookupField.getChildren().iterator();i.hasNext();) {
 			Component com = i.next();
@@ -126,6 +136,8 @@ public class Archive extends VerticalLayout {
 		
 		lookupField.setWidth("390px");
         lookupField.setDataProvider(DataProvider.ofCollection(l));
+        lookupField.getGrid().addColumn(s -> s);
+        //lookupField.setLabel("Поиск");
        
         
         HorizontalLayout searchidCardLayout = new HorizontalLayout();
@@ -143,9 +155,8 @@ public class Archive extends VerticalLayout {
      
 		searchLayout.add(lookupField, searchidCardLayout);
 		
-		
 		gridPaginatedEmployees = new PaginatedGrid<>();
-		gridPaginatedEmployees.addColumn(PastEmployees::getDateTimePass).setHeader("Дата и время").setSortable(true);
+		gridPaginatedEmployees.addColumn(PastEmployees::getWrapperLocalDateTime).setHeader("Дата и время").setSortable(true);
 		gridPaginatedEmployees.addColumn(PastEmployees::getFio)			  .setHeader("Фамилия Имя Отчество").setSortable(true);
 		gridPaginatedEmployees.addColumn(PastEmployees::getIdCard)  		  .setHeader("ID Карты").setSortable(true);
 		gridPaginatedEmployees.addColumn(PastEmployees::getTC)       .setHeader("Подразделение").setSortable(true);
@@ -176,6 +187,7 @@ public class Archive extends VerticalLayout {
 		paginator.setValue(20);
 		
 		downloadingReport = new Button("Скачать отчёт");
+		downloadingReport.setClassName("borderButton");
 		downloadingReport.setWidth("190px");
 		
 		paginatorLayout.add(downloadingReport,paginator);
@@ -185,88 +197,69 @@ public class Archive extends VerticalLayout {
 		gridPaginatedEmployees.getDataProvider().withConfigurableFilter();
 		
 		//ADD-LISTENERS ///////////////////////////////////
+		lookupField.addValueChangeListener(event -> {
+			List<PastEmployees> l = new ArrayList<PastEmployees>();
+			l.add(event.getValue());
+			gridPaginatedEmployees.setDataProvider(DataProvider.ofCollection(l));
+			gridPaginatedEmployees.getDataProvider().refreshAll();
+		});
 		paginator.addValueChangeListener(event -> {
 			gridPaginatedEmployees.setPageSize(event.getValue());
 
 		});
-		lookupField.getGrid().addColumn(s -> s).setHeader("item");
-		
+		searchIdButton.addClickListener(event -> {
+			String inputIdCard = idCardSearch.getValue();
+			PastEmployees searchedPastEmploee = null;
+			for(PastEmployees e : l) {
+				if(e.getIdCard().equals(inputIdCard)) {
+					searchedPastEmploee = e;
+					break;
+				}
+			}
+			List<PastEmployees> l = new ArrayList<PastEmployees>();
+			l.add(searchedPastEmploee);
+			gridPaginatedEmployees.setDataProvider(DataProvider.ofCollection(l));
+			gridPaginatedEmployees.getDataProvider().refreshAll();
+
+		});
 		searchDateTimeButton.addClickListener(event -> {
 			if(timeOt.isEmptyHours()) timeOt.setHours(0);
 			if(timeOt.isEmptyMinutes()) timeOt.setMinutes(0);
 			
-			if(timeDo.isEmptyHours()) timeDo.setHours(0);
-			if(timeDo.isEmptyMinutes()) timeDo.setMinutes(0);
+			if(timeDo.isEmptyHours()) timeDo.setHours(23);
+			if(timeDo.isEmptyMinutes()) timeDo.setMinutes(59);
 			
-			System.out.println("time ot " + timeOt);
-			System.out.println("time do " + timeDo);
+			gridPaginatedEmployees.setDataProvider(DataProvider.ofCollection(getFiltredListOnDateTime()));
+			gridPaginatedEmployees.getDataProvider().refreshAll();
 		});
 
 		
 	}
 	
 	
-	private void selectRow(Employee employee) {
-
-	
-//		int totalPages = 0;
-//		if (l.size() > 0) {
-//			totalPages = (int) Math.ceil((float)l.size() / paginator.getValue()); 
-//		} 
-		int indexOnPage = getINdex(employee); 
-		System.out.println(indexOnPage);
-		int numberPages = 0;
-		if (indexOnPage > 0) {
-			numberPages = (int) Math.ceil((float) indexOnPage / paginator.getValue()); 
-				//System.out.println("countPages"+numberPages);
+	private List<PastEmployees> getFiltredListOnDateTime() {
+		
+		LocalTime localTimeOt = timeOt.getTime();
+		LocalTime localTimeDo = timeDo.getTime();
+		
+		LocalDate localDateOt = datePickerOt.getValue();
+		LocalDate localDateDo = datePickerDo.getValue();
+		
+		LocalDateTime localDateTimeOt = LocalDateTime.of(localDateOt,localTimeOt);
+		LocalDateTime localDateTimeDo = LocalDateTime.of(localDateDo,localTimeDo); 
+		List<PastEmployees> res = new ArrayList<PastEmployees>();
+		
+		for(PastEmployees pe : l) {
+			if ((pe.getLocalDateTime().isAfter(localDateTimeOt)  || pe.getLocalDateTime().isEqual(localDateTimeOt)) 
+			 && (pe.getLocalDateTime().isBefore(localDateTimeDo) || pe.getLocalDateTime().isEqual(localDateTimeDo))) {
+				res.add(pe);
+			}
 		}
-		gridPaginatedEmployees.setPage(numberPages);
-		//m.select(e5);
-		gridPaginatedEmployees.scrollToIndex(19);
-		//gridPaginatedEmployees.getDataProvider().refreshAll();
-		//gridPaginatedEmployees.refreshPaginator();
-		gridPaginatedEmployees.getSelectionModel().select(e5);
+		return res;
 		
-	//m.select(e5);
-		
-		
-	
-		
-		
-		//System.out.println(getINdex(employee)%paginator.getValue());
-		
-//		for (int i = 1; totalPages >= i; i++) {
-//			gridPaginatedEmployees.setPage(i);
-//			gridPaginatedEmployees.setPageSize(l.size());
-//
-//			
-//			ListDataProvider listDataProvider = (ListDataProvider) gridPaginatedEmployees.getDataProvider();
-//			ArrayList items = (new ArrayList(listDataProvider.getItems()));
-//
-//			int index = items.indexOf(e5);
-//			System.out.println(index);
-//			System.out.println(gridPaginatedEmployees.getPage());
-//			if (index != -1) {
-//				System.out.println(index);
-//
-//				break;
-//			}
-//		}
-
-
 		
 	}
-	private int getINdex(Employee employee) {
-		int index = 0;
-		//index = l.indexOf(employee);
-		
-		
-//		gridPaginatedEmployees.setPageSize(l.size());
-//		ListDataProvider listDataProvider = (ListDataProvider) gridPaginatedEmployees.getDataProvider();
-//		ArrayList items = (new ArrayList(listDataProvider.getItems()));
-//		index = items.indexOf(employee);
-//		gridPaginatedEmployees.setPageSize(paginator.getValue());
-		return index;
-	}
+
+
 
 }

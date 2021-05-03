@@ -1,46 +1,51 @@
 package com.example.tControl.views;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.swing.SingleSelectionModel;
-
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import org.vaadin.klaudeta.PaginatedGrid;
 
-import com.example.tControl.base.ConnectionPool;
 import com.example.tControl.base.EmployeesListBase;
-import com.example.tControl.pojo.DataArrayExamples;
 import com.example.tControl.pojo.Employee;
 import com.vaadin.componentfactory.lookupfield.LookupField;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.HtmlComponent;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
-import com.vaadin.flow.component.grid.GridSelectionModel;
-import com.vaadin.flow.component.grid.GridSingleSelectionModel;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.UploadI18N;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.provider.DataProvider;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 
 @Route(value = "employeesList", layout = MainView.class)
 @PageTitle("Employees List")
@@ -53,8 +58,12 @@ public class EmployeesList extends VerticalLayout {
 	private HorizontalLayout searchLayout;
 	private HorizontalLayout searchedLayout;
 	private TextField idCardSearch;
+	private Button addEmployee;
 	private List<Employee> l;
+	private Dialog dialog;
+	//private byte[] photoByteArray;
 	Employee e5 = null;
+	private InputStream photoStream;
 	
 	
 	public EmployeesList() throws SQLException {
@@ -97,14 +106,15 @@ public class EmployeesList extends VerticalLayout {
     
         searchidCardLayout.add(idCardSearch, searchIdButton);
      
-		
-		searchLayout.add(lookupField, searchidCardLayout);
+		addEmployee = new Button("Добавить",new Icon(VaadinIcon.PLUS_CIRCLE));
+		addEmployee.getStyle().set("margin-left", "30%");
+		searchLayout.add(lookupField, searchidCardLayout, addEmployee);
 		
 		searchedLayout = new HorizontalLayout();
 		searchedLayout.setClassName("searchMargin");
 		
 		TextField searchedPrsonalNumber = new TextField();
-			searchedPrsonalNumber.setLabel("№");
+			searchedPrsonalNumber.setLabel("Табельный номер");
 			searchedPrsonalNumber.setWidth("6%");
 		TextField searchedFIO = new TextField();
 			searchedFIO.setLabel("Ф.И.О.");
@@ -120,7 +130,7 @@ public class EmployeesList extends VerticalLayout {
 			searchedPosition.setWidth("25%");
 		Button rollUpSearch = new Button(new Icon(VaadinIcon.ARROW_UP));
 		rollUpSearch.getStyle().set("margin-top", "36px");
-	
+		
 		searchedLayout.add(searchedPrsonalNumber, searchedFIO, searchedIdCard, searchedDivision, searchedPosition, rollUpSearch);
 		searchedLayout.setVisible(false);
 		searchedLayout.setEnabled(false);
@@ -151,11 +161,12 @@ public class EmployeesList extends VerticalLayout {
 		i1.setAlignItems(Alignment.START);		
 		paginator = new Select<>();
 		paginator.setWidth("80px");
-		paginator.setClassName("pagination");
+		paginator.setClassName("paginationemployee");
 		paginator.setItems(20, 30, 50);
 		paginator.setValue(20);
 		i1.add(paginator);
-		/// ADD LISTENERS
+		
+		/// ADD LISTENERS //////
 		lookupField.addValueChangeListener(event -> {
 			//System.out.println("cllick");
 			if (event.getValue() != null) {
@@ -167,7 +178,6 @@ public class EmployeesList extends VerticalLayout {
 				 searchedDivision.setValue(e.getDivision());
 				 searchedPosition.setValue(e.getPosition());
 
-				
 			}
 		});
 		rollUpSearch.addClickListener(event -> {
@@ -197,7 +207,11 @@ public class EmployeesList extends VerticalLayout {
 			gridPaginatedEmployees.setPageSize(event.getValue());
 
 		});
-		
+		addEmployee.addClickListener(event -> {
+			openDialog();
+			dialog.open();
+		});
+		// END ////////////////////////////////////
 	
 		add(searchLayout, searchedLayout, gridPaginatedEmployees, i1);
 		
@@ -235,14 +249,103 @@ public class EmployeesList extends VerticalLayout {
 		//gridPaginatedEmployees.getDataProvider().refreshAll();
 		//gridPaginatedEmployees.refreshPaginator();
 		gridPaginatedEmployees.getSelectionModel().select(e5);
+	}
+	private void openDialog() {
+		dialog = new Dialog();
+		FormLayout layoutWithBinder = new FormLayout();
 		
+		TextField prsonalNumber = new TextField();
+		prsonalNumber.setWidth("85%");
+		TextField FIO = new TextField();
+		FIO.setWidth("85%");
+		TextField idCard = new TextField();
+		idCard.setWidth("85%");
+		TextField division = new TextField();
+		division.setWidth("85%");
+		TextField position = new TextField();
+		position.setWidth("85%");
+		Button save = new  Button("Сохранить");
+		save.getStyle().set("margin-bottom", "15px");
+		layoutWithBinder.addFormItem(prsonalNumber, "Таб. номер");
+		layoutWithBinder.addFormItem(FIO, "Ф.И.О.");
+		layoutWithBinder.addFormItem(idCard, "ID карты");
+		layoutWithBinder.addFormItem(division, "Подразделение");
+		layoutWithBinder.addFormItem(position, "Должность");
+		//layoutWithBinder.add(photo);
 
-
+		MemoryBuffer buffer = new MemoryBuffer();
+		Upload upload = new Upload(buffer);
+		upload.setId("i18n-upload");
+		upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
+		// ADD_LISTENERS
+		upload.addSucceededListener(event -> {
+				photoStream = buffer.getInputStream();
+				//photoByteArray = IOUtils.toByteArray(buffer.getInputStream());
+		});
+		save.addClickListener(event->{
+			String inputPrsonalNumber = prsonalNumber.getValue();
+			String inputFIO = prsonalNumber.getValue();
+			String inputidCard = prsonalNumber.getValue();
+			String inputDivision = prsonalNumber.getValue();
+			String inputPosition = prsonalNumber.getValue();
+			if (inputPrsonalNumber.isEmpty() || inputFIO.isEmpty() || inputidCard.isEmpty() || inputDivision.isEmpty() || inputPosition.isEmpty()) {
+				Dialog dialogError = new Dialog();
+				dialogError.add(new Text("Заполните все поля!"));
+				dialogError.open();
+				return;
+			}
+			
+			try {
+				EmployeesListBase.insertEmployee(prsonalNumber.getValue(), FIO.getValue(), idCard.getValue(), division.getValue(), position.getValue(), photoStream);
+			} catch (SQLException | IOException e) {
+				e.printStackTrace();
+			}
+			dialog.close();
+		});
 		
+		// END LISTENERS ///////
+
+		UploadI18N i18n = new UploadI18N();
+		i18n.setDropFiles(
+		        new UploadI18N.DropFiles().setOne("Перетащите файл сюда...")
+		                .setMany("Перетащите файлы сюда..."))
+		        .setAddFiles(new UploadI18N.AddFiles()
+		                .setOne("Выбрать файл").setMany("Добавить файлы"))
+		        .setCancel("Отменить")
+		        .setError(new UploadI18N.Error()
+		                .setTooManyFiles("Слишком много файлов.")
+		                .setFileIsTooBig("Слишком большой файл.")
+		                .setIncorrectFileType("Некорректный тип файла."))
+		        .setUploading(new UploadI18N.Uploading()
+		                .setStatus(new UploadI18N.Uploading.Status()
+		                        .setConnecting("Соединение...")
+		                        .setStalled("Загрузка застопорилась.")
+		                        .setProcessing("Обработка файла..."))
+		                .setRemainingTime(
+		                        new UploadI18N.Uploading.RemainingTime()
+		                                .setPrefix("оставшееся время: ")
+		                                .setUnknown(
+		                                        "оставшееся время неизвестно"))
+		                .setError(new UploadI18N.Uploading.Error()
+		                        .setServerUnavailable("Сервер недоступен")
+		                        .setUnexpectedServerError(
+		                                "Неожиданная ошибка сервера")
+		                        .setForbidden("Загрузка запрещена")))
+		        .setUnits(Stream
+		                .of("Б", "Кбайт", "Мбайт", "Гбайт", "Тбайт", "Пбайт",
+		                        "Эбайт", "Збайт", "Ибайт")
+		                .collect(Collectors.toList()));
+
+		upload.setI18n(i18n);
+		layoutWithBinder.addFormItem(upload, "Фото");
+
+		dialog.setWidth("500px");
+		dialog.setHeight("430px");
+		dialog.add(layoutWithBinder);
+		dialog.add(save);
 	}
 	private int getINdex(Employee employee) {
 		int index = 0;
-		//index = l.indexOf(employee);
 		List<Employee> items = gridPaginatedEmployees.getDataProvider()
                 .fetch(new Query<>())
                 .collect(Collectors.toList());
@@ -250,6 +353,41 @@ public class EmployeesList extends VerticalLayout {
 		
 
 		return index;
+	}
+	private Component createComponent(String mimeType, String fileName, InputStream stream) {
+
+        Image image = new Image();
+        try {
+
+            byte[] bytes = IOUtils.toByteArray(stream);
+            
+            image.getElement().setAttribute("src", new StreamResource(fileName, () -> new ByteArrayInputStream(bytes)));
+            
+            try (ImageInputStream in = ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))) {
+            	
+                final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
+                if (readers.hasNext()) {
+                    ImageReader reader = readers.next();
+                    try {
+                        reader.setInput(in);
+                        image.setWidth(reader.getWidth(0) + "px");
+                        image.setHeight(reader.getHeight(0) + "px");
+                    } finally {
+                        reader.dispose();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+	}
+
+	private void showOutput(String text, Component content, HasComponents outputContainer) {
+	    HtmlComponent p = new HtmlComponent(Tag.P);
+	    p.getElement().setText(text);
+	    outputContainer.add(p);
+	    outputContainer.add(content);
 	}
 
 }

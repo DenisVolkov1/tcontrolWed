@@ -1,6 +1,10 @@
 package com.example.tControl.pojo;
 
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -167,8 +171,8 @@ public class DataArrayExamples {
 		
 		List<Employee> res = new ArrayList<Employee>(fio.length);
 		for(int i = 0; i < fio.length; i++) {
-			Employee e = new Employee(new Integer(i).toString(),fio[getRandomNumber( 0, fio.length-1)], getIdRandom(), division[getRandomNumber(0, division.length-1)], position[getRandomNumber(0, position.length-1)]);
-			res.add(e);
+			//Employee e = new Employee(new Integer(i).toString(),fio[getRandomNumber( 0, fio.length-1)], getIdRandom(), division[getRandomNumber(0, division.length-1)], position[getRandomNumber(0, position.length-1)]);
+			//res.add(e);
 		}
 		return res;
 	}
@@ -176,7 +180,7 @@ public class DataArrayExamples {
 		
 		List<PastEmployees> res = new ArrayList<PastEmployees>(fio.length);
 		for(int i = 0; i < fio.length; i++) {
-			PastEmployees e = new PastEmployees(timestamp().toLocaleString(), fio[getRandomNumber( 0, fio.length-1)], getIdRandom(), String.valueOf(getRandomNumber(36, 42)), passage[getRandomNumber(0, passage.length-1)]);
+			PastEmployees e = new PastEmployees(timestamp(), fio[getRandomNumber( 0, fio.length-1)], getIdRandom(), String.valueOf(getRandomNumber(36, 42)), passage[getRandomNumber(0, passage.length-1)]);
 			res.add(e);
 		}
 		return res;
@@ -192,8 +196,12 @@ public class DataArrayExamples {
 	public static int getRandomNumber(int min, int max) {
 	    return (int) ((Math.random() * (max - min)) + min);
 	}
-	public static Date timestamp() {
-	    return new Date(ThreadLocalRandom.current().nextInt() * 1000L);
+	public static LocalDateTime timestamp() {
+		ZoneOffset zoneOffSet= ZoneOffset.of("+05:00");
+ 										//max   min     min
+		int ir = (int) ((Math.random() * (6_000_000 - 4_000_000)) + 4_000_000);
+
+	    return  LocalDateTime.ofEpochSecond(1_616_000_000L + (long)ir, 0 ,zoneOffSet);
 	}
 	
 }

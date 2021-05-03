@@ -1,32 +1,22 @@
 package com.example.tControl.views;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
 
@@ -43,35 +33,13 @@ public class MainView extends AppLayout {
     private H1 viewTitle;
     private H1 time;
     private H1 date;
-    private TimeAndDateDeamonThread andDateDeamonThread;
 
     public MainView() {
+    	System.out.println("init");
         setPrimarySection(Section.NAVBAR);
         addToNavbar(true, createHeaderContent());
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
-    }
-    private class TimeAndDateDeamonThread extends Thread {
-    	
-    	public TimeAndDateDeamonThread() {
-    		
-    		setDaemon(true);
-    	}
-    	public void run() {
-            while (true) {
-
-                DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-                DateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
-
-                time.setText(timeFormat.format( System.currentTimeMillis()));
-                date.setText(dateFormat.format( System.currentTimeMillis()));
-                System.out.println("time "+timeFormat.format(System.currentTimeMillis())+"date "+dateFormat.format(System.currentTimeMillis()));
-                
-                try {sleep(500);} catch (InterruptedException e) {}
-                                    	
-            }
-        }
-    	
     }
 
     private Component createHeaderContent() {

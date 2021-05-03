@@ -1,6 +1,10 @@
 
 .pagination {
-	margin-left: 76%;
+	margin-left: 78%;
+}
+.borderButton {
+	  border-style: solid;
+  border-color: rgb(230, 240, 255);
 }
 .searchMargin {
 	margin-top: 10px;

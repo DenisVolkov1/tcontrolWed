@@ -1,8 +1,14 @@
 package com.example.tControl.component;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
@@ -12,20 +18,21 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.shared.communication.PushMode;
 
 
 //@Push(PushMode.MANUAL)
 @Route("pushVerticalLayout")
-public class PushVerticalLayout extends VerticalLayout{
+public class PushVerticalLayout<T extends Component> extends VerticalLayout {
 
 	private FeederThread thread;
 	private FeederThreadAddPrevousItems thread2;
 	private static UI ui;
-	private  List<Component> listItems;
+	private  List<T> listItems;
 	private boolean isDetached;
 
-    public PushVerticalLayout(List<Component> itemsList) {
+    public PushVerticalLayout(List<T> itemsList) {
     	this.listItems = itemsList;
 	}
 
@@ -56,12 +63,12 @@ public class PushVerticalLayout extends VerticalLayout{
 
     private class FeederThread extends Thread {
         private final UI ui;
-        private final PushVerticalLayout view;
+        private final PushVerticalLayout<T> view;
         private final Component addComponent;
 
         private int count = 0;
 
-        public FeederThread(UI ui, PushVerticalLayout view, Component addComponent) {
+        public FeederThread(UI ui, PushVerticalLayout<T> view, Component addComponent) {
             this.ui = ui;
             this.view = view;
             this.addComponent = addComponent;
@@ -70,9 +77,28 @@ public class PushVerticalLayout extends VerticalLayout{
         @Override
         public void run() {
 
-                ui.access(() -> {
-                	listItems.add(addComponent);
-                	System.out.println("current size = "+listItems.size());
+                ui.access(() -> {   	
+//	                EntityManagerFactory emf = Persistence.createEntityManagerFactory("my");
+//	            	EntityManager em = emf.createEntityManager();
+//	            	// Retrieve image from database from user id = 1
+//	
+//	            	Query q = em.createQuery("SELECT photoByteArray FROM Employee WHERE id = 107");
+//	            	byte[] bytes = (byte[]) q.getSingleResult();
+//        		
+//        		// Set the image from database
+//	            	StreamResource imageResource = new StreamResource("",() -> new ByteArrayInputStream(bytes));
+//	            	if (addComponent instanceof MessageTemperatureComponent) {
+//	            		System.out.println("MessageTemperatureComponent");
+//	            		MessageTemperatureComponent c = (MessageTemperatureComponent)addComponent;
+//	            		
+//	            		c.photo.getElement().setAttribute("src", imageResource);
+//	            		
+//	            	}
+	            	
+	            	
+                	listItems.add((T) addComponent);
+                	
+                	//System.out.println("current size = "+listItems.size());
                     view.add(addComponent);
                     ui.getPushConfiguration().setPushMode(PushMode.MANUAL);
                     ui.push();
@@ -83,10 +109,10 @@ public class PushVerticalLayout extends VerticalLayout{
     
     private class FeederThreadAddPrevousItems extends Thread {
         private final UI ui;
-        private final PushVerticalLayout view;
-        private List<Component> addedComponents;
+        private final PushVerticalLayout<T> view;
+        private List<T> addedComponents;
 
-        public FeederThreadAddPrevousItems(UI ui, PushVerticalLayout view, List<Component> addedComponents) {
+        public FeederThreadAddPrevousItems(UI ui, PushVerticalLayout<T> view, List<T> addedComponents) {
             this.ui = ui;
             this.view = view;
             this.addedComponents = addedComponents;
@@ -97,7 +123,7 @@ public class PushVerticalLayout extends VerticalLayout{
 
                 ui.access(() -> {
                 	synchronized (view) {
-                		System.out.println(addedComponents.size());
+                		//System.out.println(addedComponents.size());
 	                	for(Component c : addedComponents) {
 	                			view.add(c);
 	                	}
