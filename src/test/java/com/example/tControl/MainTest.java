@@ -20,9 +20,13 @@ import org.hibernate.cfg.Environment;
 import com.example.tControl.base.ConnectionPool;
 import com.example.tControl.base.EmployeesListBase;
 import com.example.tControl.base.PastEmployeesBase;
+import com.example.tControl.component.MessageTemperatureComponent;
+import com.example.tControl.myObject.WrapperLocalDateTime;
+import com.example.tControl.myObject.list.OnlyFor24HoursPastList;
 import com.example.tControl.pojo.DataArrayExamples;
 import com.example.tControl.pojo.Employee;
 import com.example.tControl.pojo.PastEmployees;
+import com.helger.commons.wrapper.Wrapper;
 
 public class MainTest {
 
@@ -35,8 +39,16 @@ public class MainTest {
 		
 		//PastEmployeesBase.insertPastEmployee(106, "40.7", LocalDateTime.now());
 		
-		System.out.println(PastEmployeesBase.getAll());
-		System.out.println(EmployeesListBase.getAll());
+//		System.out.println(PastEmployeesBase.getAll());
+//		System.out.println(EmployeesListBase.getAll());
+		
+		
+		
+		
+		OnlyFor24HoursPastList<MessageSC> r = new OnlyFor24HoursPastList<MessageSC>();
+		
+		r.add(new MessageSC(null,null, null));
+		
 		
 	
 	    

@@ -9,17 +9,20 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.shared.communication.PushMode;
 
-public class PushImage extends Image{
+public class PushImage extends Image {
 	private  Employee e;
-	
+	private StreamResource imageResource;
 	
 	 public PushImage(Employee e) {
+		 
 		 this.e = e;
+		 imageResource = new StreamResource("",() -> new ByteArrayInputStream(e.getPhotoByteArray()));
+		 imageResource.setCacheTime(0);
 	}
 
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
-		System.out.println("attachImages");
+
 		PushImage pi = this;
 		UI ui = attachEvent.getUI();
 		Thread t = new Thread(new Runnable() {
@@ -35,8 +38,9 @@ public class PushImage extends Image{
 //		            	Query q = em.createQuery("SELECT photoByteArray FROM Employee WHERE id = "+idEmployee);
 //		            	byte[] bytes = (byte[]) q.getSingleResult();
 		            	
-		            	StreamResource imageResource = new StreamResource("",() -> new ByteArrayInputStream(e.getPhotoByteArray()));
-	    
+		            	//imageResource = new StreamResource("",() -> new ByteArrayInputStream(e.getPhotoByteArray()));
+		            	//imageResource.setCacheTime(0);
+		            	
 		            	pi.getElement().setAttribute("src", imageResource);
 	                    ui.getPushConfiguration().setPushMode(PushMode.MANUAL);
 	                    ui.push();
@@ -47,6 +51,10 @@ public class PushImage extends Image{
 			
 		});
 		t.start();
+	}
+
+	public StreamResource getImageResource() {
+		return imageResource;
 	}
 
 

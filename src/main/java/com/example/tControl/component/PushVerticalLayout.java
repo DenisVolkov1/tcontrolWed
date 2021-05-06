@@ -77,24 +77,7 @@ public class PushVerticalLayout<T extends Component> extends VerticalLayout {
         @Override
         public void run() {
 
-                ui.access(() -> {   	
-//	                EntityManagerFactory emf = Persistence.createEntityManagerFactory("my");
-//	            	EntityManager em = emf.createEntityManager();
-//	            	// Retrieve image from database from user id = 1
-//	
-//	            	Query q = em.createQuery("SELECT photoByteArray FROM Employee WHERE id = 107");
-//	            	byte[] bytes = (byte[]) q.getSingleResult();
-//        		
-//        		// Set the image from database
-//	            	StreamResource imageResource = new StreamResource("",() -> new ByteArrayInputStream(bytes));
-//	            	if (addComponent instanceof MessageTemperatureComponent) {
-//	            		System.out.println("MessageTemperatureComponent");
-//	            		MessageTemperatureComponent c = (MessageTemperatureComponent)addComponent;
-//	            		
-//	            		c.photo.getElement().setAttribute("src", imageResource);
-//	            		
-//	            	}
-	            	
+                ui.access(() -> {   		            	
 	            	
                 	listItems.add((T) addComponent);
                 	

@@ -77,7 +77,7 @@ public class Desktop extends VerticalLayout {
 		timeExtendedInformation = new H6("20:30");
 		labelExtendedInformation.add(fioExtendedInformation, divisionExtendedInformation,positionExtendedInformation ,idCardExtendedInformation,tCExtendedInformation,timeExtendedInformation);
 		
-		photoExtendedInformation = /*getI();*/new Image("images/noPhoto.png", "noPhoto");
+		photoExtendedInformation = new Image("images/noPhoto.png", "noPhoto");
 		photoExtendedInformation.setWidth("220px");
 		photoExtendedInformation.setHeight("220px");
 		
@@ -88,7 +88,7 @@ public class Desktop extends VerticalLayout {
 			expandButton.setEnabled(false);
 			expandButton.setVisible(false);
 			listBoxLayout.setHeight("650px");
-			getI();
+		
 			
 		});
 		expandButton.setEnabled(true);
@@ -132,54 +132,54 @@ public class Desktop extends VerticalLayout {
 		
 	}
 	//"images/noPhoto.png", "noPhoto"
-	private Component createMessageTemperatureComponent(String photoUrl,String fio, String tC,String time) {
-		HorizontalLayout layout = new HorizontalLayout();
-		//layout.setHeight("100px");
-		layout.setWidthFull();
-		layout.setClassName("hoverMesTempComp");
-		
-		Image image = new Image(photoUrl, "noPhoto");
-		image.setWidth("90px");
-		image.setHeight("90px");
-		layout.add(image);
-		VerticalLayout layout2 = new VerticalLayout();
-		//layout2.setWidth("200px");
-		
-		H5 fioLabel = new H5(fio);
-		fioLabel.setClassName("h5");
-		fioLabel.setWidth("300px");
-
-		H6 cardId = new H6("456789258");
-		//cardId.setClassName("h5");
-
-		layout2.add(fioLabel, cardId);
-		
-		VerticalLayout layout3 = new VerticalLayout();
-		H6 tCLabel = new H6(tC);
-		tCLabel.setClassName("h5");
-
-		H6 timeLabel = new H6(time);
-		//timeLabel.setClassName("h5");
-
-		layout3.add(tCLabel, timeLabel);
-
-		layout.add(image,layout2,layout3);
-		
-		layout.addClickListener(event -> {
-			extendedInformation.setEnabled(true);
-			extendedInformation.setVisible(true);
-			//
-			expandButton.setEnabled(false);
-			expandButton.setVisible(false);
-			
-			
-		});
-		//layout.addEventListener("mouseover",enevt -> System.out.println("oblgfbdfg"));
-           
-        
-		
-		return layout;
-	}
+//	private Component createMessageTemperatureComponent(String photoUrl,String fio, String tC,String time) {
+//		HorizontalLayout layout = new HorizontalLayout();
+//		//layout.setHeight("100px");
+//		layout.setWidthFull();
+//		layout.setClassName("hoverMesTempComp");
+//		
+//		Image image = new Image(photoUrl, "noPhoto");
+//		image.setWidth("90px");
+//		image.setHeight("90px");
+//		layout.add(image);
+//		VerticalLayout layout2 = new VerticalLayout();
+//		//layout2.setWidth("200px");
+//		
+//		H5 fioLabel = new H5(fio);
+//		fioLabel.setClassName("h5");
+//		fioLabel.setWidth("300px");
+//
+//		H6 cardId = new H6("456789258");
+//		//cardId.setClassName("h5");
+//
+//		layout2.add(fioLabel, cardId);
+//		
+//		VerticalLayout layout3 = new VerticalLayout();
+//		H6 tCLabel = new H6(tC);
+//		tCLabel.setClassName("h5");
+//
+//		H6 timeLabel = new H6(time);
+//		//timeLabel.setClassName("h5");
+//
+//		layout3.add(tCLabel, timeLabel);
+//
+//		layout.add(image,layout2,layout3);
+//		
+//		layout.addClickListener(event -> {
+//			extendedInformation.setEnabled(true);
+//			extendedInformation.setVisible(true);
+//			//
+//			expandButton.setEnabled(false);
+//			expandButton.setVisible(false);
+//			
+//			
+//		});
+//		//layout.addEventListener("mouseover",enevt -> System.out.println("oblgfbdfg"));
+//           
+//        
+//		
+//		return layout;
+//	}
 	
 //    private class TimeAndDateDeamonThread extends Thread {
 //    	
@@ -207,7 +207,7 @@ public class Desktop extends VerticalLayout {
 //    	
 //    }
     
-    public static ComponentEventListener<ClickEvent<HorizontalLayout>> getExtendedInformationListener(String fio, String division, String position, String idCard, String time, Image photo) {
+    public static ComponentEventListener<ClickEvent<HorizontalLayout>> getExtendedInformationListener(String fio, String division, String position, String idCard, String time, StreamResource imageResource) {
     	ComponentEventListener<ClickEvent<HorizontalLayout>> listener = new ComponentEventListener<ClickEvent<HorizontalLayout>>() {
 			
 			@Override
@@ -223,31 +223,38 @@ public class Desktop extends VerticalLayout {
 				Desktop.positionExtendedInformation.setText(position);
 				Desktop.idCardExtendedInformation.setText(idCard);
 				Desktop.timeExtendedInformation.setText(time);
-				Desktop.photoExtendedInformation = photo;
+				
+		    	SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+		    	String filename = "myfilename-" + df.format(new Date()) + ".png";
+		    	
+		    	//imageResource.setF
+		    	//Desktop.photoExtendedInformation.se
+		    	Desktop.photoExtendedInformation.getElement().setAttribute("src", imageResource);
+				//(Desktop.photoExtendedInformation).setSrc(imageResource);
 			}
 		};
 		return listener;
     }
     
-    public static void getI() {
-    	//Image i = new Image();
-    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("my");
-    	EntityManager em = emf.createEntityManager();
-    	// Retrieve image from database from user id = 1
-
-    	Query q = em.createQuery("SELECT photoByteArray FROM Employee WHERE id = 107");
-    	byte[] bytes = (byte[]) q.getSingleResult();
-		
-		// Set the image from database
-    	StreamResource imageResource = new StreamResource("",() -> new ByteArrayInputStream(bytes));
-    	
-    	SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-    	String filename = "myfilename-" + df.format(new Date()) + ".png";
-    	
-    	//imageResource.setF
-    	photoExtendedInformation.getElement().setAttribute("src", imageResource);
-		//return i;
-    }
+//    public static void getI() {
+//    	//Image i = new Image();
+//    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("my");
+//    	EntityManager em = emf.createEntityManager();
+//    	// Retrieve image from database from user id = 1
+//
+//    	Query q = em.createQuery("SELECT photoByteArray FROM Employee WHERE id = 107");
+//    	byte[] bytes = (byte[]) q.getSingleResult();
+//		
+//		// Set the image from database
+//    	StreamResource imageResource = new StreamResource("",() -> new ByteArrayInputStream(bytes));
+//    	
+//    	SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+//    	String filename = "myfilename-" + df.format(new Date()) + ".png";
+//    	
+//    	//imageResource.setF
+//    	photoExtendedInformation.getElement().setAttribute("src", imageResource);
+//		//return i;
+//    }
 
 	public static HorizontalLayout getExtendedInformation() {
 		return extendedInformation;
