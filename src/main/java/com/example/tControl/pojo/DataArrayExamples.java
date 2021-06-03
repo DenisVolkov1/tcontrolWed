@@ -171,8 +171,8 @@ public class DataArrayExamples {
 		
 		List<Employee> res = new ArrayList<Employee>(fio.length);
 		for(int i = 0; i < fio.length; i++) {
-			//Employee e = new Employee(new Integer(i).toString(),fio[getRandomNumber( 0, fio.length-1)], getIdRandom(), division[getRandomNumber(0, division.length-1)], position[getRandomNumber(0, position.length-1)]);
-			//res.add(e);
+			Employee e = new Employee(new Integer(i).toString(),fio[getRandomNumber( 0, fio.length-1)], getIdRandom(), division[getRandomNumber(0, division.length-1)], position[getRandomNumber(0, position.length-1)]);
+			res.add(e);
 		}
 		return res;
 	}

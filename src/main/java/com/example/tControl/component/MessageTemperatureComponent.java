@@ -19,36 +19,54 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.server.StreamResource;
 
 public class MessageTemperatureComponent extends HorizontalLayout {
-//	private Employee informationPassedEmployee;
-//	private LocalDateTime dateTimePassed;
-//	private String temperaturePassedEmployee;
+
 	private MessageTemperatureInformation information;
 	public StreamResource imageResource;
 	
-	public MessageTemperatureComponent(Employee informationPassedEmployee,String temperaturePassedEmployee, LocalDateTime dateTimePassed) {
-		this.information = new MessageTemperatureInformation(informationPassedEmployee, temperaturePassedEmployee, dateTimePassed);
-//		this.informationPassedEmployee = informationPassedEmployee;
-//		this.temperaturePassedEmployee = temperaturePassedEmployee;
-//		this.dateTimePassed = dateTimePassed;
+//	public MessageTemperatureComponent(Employee informationPassedEmployee,String temperaturePassedEmployee, LocalDateTime dateTimePassed) {
+//		this.information = new MessageTemperatureInformation(informationPassedEmployee, temperaturePassedEmployee, dateTimePassed);
+//
+//		setWidthFull();
+//		setClassName("hoverMesTempComp");
+//		PushImage photo = new PushImage(informationPassedEmployee);
+//		imageResource = photo.getImageResource();
+//		
+//		photo.setWidth("90px");
+//		photo.setHeight("90px");
+//		add(photo);
+//		VerticalLayout layout2 = new VerticalLayout();
+//
+//		H5 fioLabel = new H5(informationPassedEmployee.getFio());
+//		fioLabel.setClassName("h5");
+//		fioLabel.setWidth("300px");
+//
+//		H6 cardId = new H6("456789258");
+//
+//		layout2.add(fioLabel, cardId);
+//		
+//		VerticalLayout layout3 = new VerticalLayout();
+//		H6 tCLabel = new H6(temperaturePassedEmployee);
+//		tCLabel.setClassName("h5");
+//
+//		H6 timeLabel = new H6("Проход №1");
+//
+//		layout3.add(tCLabel, timeLabel);
+//
+//		add(photo,layout2,layout3);
+//		
+//		// ADD LISTENERS
+//		DateTimeFormatter formatTime = DateTimeFormatter.ofPattern("HH:mm");
+//			String time = dateTimePassed.format(formatTime);
+//				addClickListener(Desktop.getExtendedInformationListener(informationPassedEmployee.getFio(), informationPassedEmployee.getDivision(), informationPassedEmployee.getPosition(), informationPassedEmployee.getIdCard(), time, imageResource));
+//	}
+	
+	public MessageTemperatureComponent(MessageTemperatureInformation information) {
+		this.information = information;
 
 		setWidthFull();
 		setClassName("hoverMesTempComp");
-		PushImage photo = new PushImage(informationPassedEmployee);
+		PushImage photo = new PushImage(information.getInformationPassedEmployee());
 		imageResource = photo.getImageResource();
-	  	//EntityManagerFactory emf = Persistence.createEntityManagerFactory("my");
-    	//EntityManager em = emf.createEntityManager();
-
-
-    	//Query q = em.createQuery("SELECT photoByteArray FROM Employee WHERE id = 107");
-    	
-		
-		
-    	//byte[] bytesPhoto = (byte[]) q.getSingleResult();
-    	//System.out.println(bytesPhoto.length);
-
-    	//StreamResource imageResource = new StreamResource("",() -> new ByteArrayInputStream(bytesPhoto));
-    	
-    	//photo.getElement().setAttribute("src", imageResource);
 		
 		photo.setWidth("90px");
 		photo.setHeight("90px");
@@ -56,7 +74,7 @@ public class MessageTemperatureComponent extends HorizontalLayout {
 		VerticalLayout layout2 = new VerticalLayout();
 
 		
-		H5 fioLabel = new H5(informationPassedEmployee.getFio());
+		H5 fioLabel = new H5(information.getInformationPassedEmployee().getFio());
 		fioLabel.setClassName("h5");
 		fioLabel.setWidth("300px");
 
@@ -65,20 +83,20 @@ public class MessageTemperatureComponent extends HorizontalLayout {
 		layout2.add(fioLabel, cardId);
 		
 		VerticalLayout layout3 = new VerticalLayout();
-		H6 tCLabel = new H6(temperaturePassedEmployee);
+		H6 tCLabel = new H6(information.getTemperaturePassedEmployee());
 		tCLabel.setClassName("h5");
 
 		H6 timeLabel = new H6("Проход №1");
-
+		
 		layout3.add(tCLabel, timeLabel);
-
 		add(photo,layout2,layout3);
 		
 		// ADD LISTENERS
 		DateTimeFormatter formatTime = DateTimeFormatter.ofPattern("HH:mm");
-			String time = dateTimePassed.format(formatTime);
-		addClickListener(Desktop.getExtendedInformationListener(informationPassedEmployee.getFio(), informationPassedEmployee.getDivision(), informationPassedEmployee.getPosition(), informationPassedEmployee.getIdCard(), time, imageResource));
+			String time = (information.getDateTimePassed()).format(formatTime);
+		addClickListener(Desktop.getExtendedInformationListener(information.getInformationPassedEmployee().getFio(), information.getInformationPassedEmployee().getDivision(), information.getInformationPassedEmployee().getPosition(), information.getInformationPassedEmployee().getIdCard(), time, imageResource));
 	}
+	
 
 	public StreamResource getImageResource() {
 		return imageResource;

@@ -8,6 +8,7 @@ import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 
 import com.example.tControl.base.PastEmployeesBase;
 import com.example.tControl.component.MessageTemperatureComponent;
+import com.example.tControl.myObject.MessageTemperatureInformation;
 import com.example.tControl.pojo.Employee;
 import com.example.tControl.views.Desktop;
 
@@ -36,11 +37,12 @@ public class ClientMqtt {
 	                try {
 	                	String[] mes =  mqttMessage.toString().split("_");
 						Employee informationPassedEmployee = PastEmployeesBase.insertPastEmployee(Integer.valueOf(mes[0]), mes[1],timePassed);
-						
-							MessageTemperatureComponent temperatureComponent = new MessageTemperatureComponent(informationPassedEmployee, mes[0], timePassed);
+						MessageTemperatureInformation messageTemperatureInformation = new MessageTemperatureInformation(informationPassedEmployee, mes[0], timePassed);
+							MessageTemperatureComponent temperatureComponent = new MessageTemperatureComponent(messageTemperatureInformation);
+							
 							System.out.println(temperatureComponent);
 							Desktop.getListBoxLayout().addWithPush(temperatureComponent);
-								Desktop.getItemsList().add(temperatureComponent);
+								Desktop.getItemsListTemperatureInformation().add(messageTemperatureInformation);
 							
 			
 						    	

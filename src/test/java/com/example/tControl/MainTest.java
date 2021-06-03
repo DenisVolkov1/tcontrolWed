@@ -29,25 +29,22 @@ import com.example.tControl.pojo.PastEmployees;
 import com.helger.commons.wrapper.Wrapper;
 
 public class MainTest {
-
+	//personnelNumber, fio,idCard,division,position,addDateTime
 	  
 	  
 	public static void main(String[] args) throws SQLException {
 			
-		
-		//System.out.println(EmployeesListBase.getEmployeeByID(107));
-		
-		//PastEmployeesBase.insertPastEmployee(106, "40.7", LocalDateTime.now());
-		
-//		System.out.println(PastEmployeesBase.getAll());
-//		System.out.println(EmployeesListBase.getAll());
+//		for(Employee e : DataArrayExamples.getArrayListEmployees()) {
+//			
+//			System.out.println("("+ "'"+ e.getPersonnelNumber()+"',"+ "'"+ e.getFio()+"',"+ "'"+ e.getIdCard()+"',"+ "'"+ e.getDivision()+"',"+ "'"+ e.getPosition()+"',"+ "'2021-06-03 15:13:00'" + "),"); //YYYY-MM-DD hh:mm:ss
+//		}
 		
 		
 		
 		
-		OnlyFor24HoursPastList<MessageSC> r = new OnlyFor24HoursPastList<MessageSC>();
 		
-		r.add(new MessageSC(null,null, null));
+		
+
 		
 		
 	

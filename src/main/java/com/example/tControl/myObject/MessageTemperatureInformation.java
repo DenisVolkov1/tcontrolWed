@@ -10,7 +10,6 @@ public class MessageTemperatureInformation {
 	private LocalDateTime dateTimePassed;
 	private String temperaturePassedEmployee;
 	
-	
 	public MessageTemperatureInformation(Employee informationPassedEmployee,String temperaturePassedEmployee, LocalDateTime dateTimePassed) {
 		super();
 		this.informationPassedEmployee = informationPassedEmployee;
@@ -18,20 +17,16 @@ public class MessageTemperatureInformation {
 		this.temperaturePassedEmployee = temperaturePassedEmployee;
 	}
 
-
 	public Employee getInformationPassedEmployee() {
 		return informationPassedEmployee;
 	}
-
 
 	public LocalDateTime getDateTimePassed() {
 		return dateTimePassed;
 	}
 
-
 	public String getTemperaturePassedEmployee() {
 		return temperaturePassedEmployee;
 	}
 	
-
 }

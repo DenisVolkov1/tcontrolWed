@@ -8,11 +8,12 @@ import java.util.Iterator;
 import com.example.tControl.component.MessageTemperatureComponent;
 
 public class OnlyFor24HoursPastList<T extends MessageTemperatureComponent> extends ArrayList<T>{
-	@Override
-	public boolean add(T e) {
-		//
+
+	
+	public boolean addOnlyFor24Hours(T e) {
 		LocalDateTime now =  LocalDateTime.now();
-			LocalDateTime nowMinus24hours =  now.minus(Duration.ofHours(24));
+		//LocalDateTime nowMinus24hours =  now.minus(Duration.ofHours(24));
+		LocalDateTime nowMinus24hours =  now.minus(Duration.ofSeconds(24));
 		Iterator<T> i = this.iterator();
 		while (i.hasNext()) {
 		   T t = i.next(); // must be called before you can call i.remove()

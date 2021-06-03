@@ -14,6 +14,7 @@ import javax.persistence.Query;
 
 import com.example.tControl.component.MessageTemperatureComponent;
 import com.example.tControl.component.PushVerticalLayout;
+import com.example.tControl.myObject.MessageTemperatureInformation;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -55,13 +56,14 @@ public class Desktop extends VerticalLayout {
 
 	//
 	private static PushVerticalLayout<MessageTemperatureComponent> listBoxLayout;
-	private static List<MessageTemperatureComponent> itemsList = new ArrayList<MessageTemperatureComponent>();
+	//private static List<MessageTemperatureComponent> itemsList = new ArrayList<MessageTemperatureComponent>();
+	private static List<MessageTemperatureInformation> itemsListTemperatureInformation = new ArrayList<MessageTemperatureInformation>();
+	private static List<MessageTemperatureComponent> itemsListTemperatureComponent = new ArrayList<MessageTemperatureComponent>();
 	//
 	private static Button expandButton;
 	
 	public Desktop() {
 		
-	
 		extendedInformation = new HorizontalLayout();
 		extendedInformation.setEnabled(false);
 		extendedInformation.setVisible(false);
@@ -104,7 +106,9 @@ public class Desktop extends VerticalLayout {
 		
 		extendedInformation.add(labelExtendedInformation, photoExtendedInformation,rollUpButton,expandButton);
 		
-		listBoxLayout =  new PushVerticalLayout<MessageTemperatureComponent>(itemsList);
+		itemsListTemperatureComponent = new ArrayList<MessageTemperatureComponent>();
+			fillInItemsListTemperatureComponent();
+				listBoxLayout =  new PushVerticalLayout<MessageTemperatureComponent>(itemsListTemperatureComponent);
 		
 		ListBox<Object> listBox = new ListBox<>();
 
@@ -119,7 +123,7 @@ public class Desktop extends VerticalLayout {
 		listBoxLayout.getStyle().set("overflow", "auto");
 		listBoxLayout.setHeight("400px");
 
-		itemsList = new ArrayList<MessageTemperatureComponent>();
+		//itemsList = new ArrayList<MessageTemperatureComponent>();
 		
 		listBox.setRenderer(new ComponentRenderer(item -> {
 
@@ -130,6 +134,14 @@ public class Desktop extends VerticalLayout {
 		listBoxLayout.setSpacing(true);
 		add(extendedInformation,expandButton,listBoxLayout);
 		
+	}
+	private void fillInItemsListTemperatureComponent() {
+		if(itemsListTemperatureInformation.size() > 0) {
+			for (MessageTemperatureInformation imti : itemsListTemperatureInformation) {
+				MessageTemperatureComponent temperatureComponent = new MessageTemperatureComponent(imti);
+				itemsListTemperatureComponent.add(temperatureComponent);
+			}
+		}
 	}
 	//"images/noPhoto.png", "noPhoto"
 //	private Component createMessageTemperatureComponent(String photoUrl,String fio, String tC,String time) {
@@ -304,8 +316,8 @@ public class Desktop extends VerticalLayout {
 	public static PushVerticalLayout<MessageTemperatureComponent> getListBoxLayout() {
 		return listBoxLayout;
 	}
-	public static List<MessageTemperatureComponent> getItemsList() {
-		return itemsList;
+	public static List<MessageTemperatureInformation> getItemsListTemperatureInformation() {
+		return itemsListTemperatureInformation;
 	}
 	public static LocalDateTime getLastedDateTime() {
 		return lastedDateTime;
