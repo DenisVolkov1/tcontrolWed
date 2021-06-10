@@ -35,7 +35,7 @@ public class MainView extends AppLayout {
     private H1 date;
 
     public MainView() {
-    	System.out.println("init");
+    	System.out.println("init MainView");
         setPrimarySection(Section.NAVBAR);
         addToNavbar(true, createHeaderContent());
         menu = createMenu();

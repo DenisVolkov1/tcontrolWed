@@ -15,9 +15,11 @@ import javax.persistence.Query;
 import com.example.tControl.component.MessageTemperatureComponent;
 import com.example.tControl.component.PushVerticalLayout;
 import com.example.tControl.myObject.MessageTemperatureInformation;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -107,7 +109,7 @@ public class Desktop extends VerticalLayout {
 		extendedInformation.add(labelExtendedInformation, photoExtendedInformation,rollUpButton,expandButton);
 		
 		itemsListTemperatureComponent = new ArrayList<MessageTemperatureComponent>();
-			fillInItemsListTemperatureComponent();
+//			fillInItemsListTemperatureComponent();
 				listBoxLayout =  new PushVerticalLayout<MessageTemperatureComponent>(itemsListTemperatureComponent);
 		
 		ListBox<Object> listBox = new ListBox<>();
@@ -125,6 +127,8 @@ public class Desktop extends VerticalLayout {
 
 		//itemsList = new ArrayList<MessageTemperatureComponent>();
 		
+		
+		
 		listBox.setRenderer(new ComponentRenderer(item -> {
 
 		    return item;
@@ -135,6 +139,21 @@ public class Desktop extends VerticalLayout {
 		add(extendedInformation,expandButton,listBoxLayout);
 		
 	}
+	@Override
+	protected void onAttach(AttachEvent attachEvent) {
+		System.out.println("onAttach_Desktop");
+		itemsListTemperatureComponent = new ArrayList<MessageTemperatureComponent>();
+		fillInItemsListTemperatureComponent();
+			//listBoxLayout =  new PushVerticalLayout<MessageTemperatureComponent>(itemsListTemperatureComponent);
+		
+	}
+
+	
+	@Override
+	protected void onDetach(DetachEvent detachEvent) {
+		// TODO Auto-generated method stub
+		super.onDetach(detachEvent);
+	}
 	private void fillInItemsListTemperatureComponent() {
 		if(itemsListTemperatureInformation.size() > 0) {
 			for (MessageTemperatureInformation imti : itemsListTemperatureInformation) {
@@ -143,81 +162,6 @@ public class Desktop extends VerticalLayout {
 			}
 		}
 	}
-	//"images/noPhoto.png", "noPhoto"
-//	private Component createMessageTemperatureComponent(String photoUrl,String fio, String tC,String time) {
-//		HorizontalLayout layout = new HorizontalLayout();
-//		//layout.setHeight("100px");
-//		layout.setWidthFull();
-//		layout.setClassName("hoverMesTempComp");
-//		
-//		Image image = new Image(photoUrl, "noPhoto");
-//		image.setWidth("90px");
-//		image.setHeight("90px");
-//		layout.add(image);
-//		VerticalLayout layout2 = new VerticalLayout();
-//		//layout2.setWidth("200px");
-//		
-//		H5 fioLabel = new H5(fio);
-//		fioLabel.setClassName("h5");
-//		fioLabel.setWidth("300px");
-//
-//		H6 cardId = new H6("456789258");
-//		//cardId.setClassName("h5");
-//
-//		layout2.add(fioLabel, cardId);
-//		
-//		VerticalLayout layout3 = new VerticalLayout();
-//		H6 tCLabel = new H6(tC);
-//		tCLabel.setClassName("h5");
-//
-//		H6 timeLabel = new H6(time);
-//		//timeLabel.setClassName("h5");
-//
-//		layout3.add(tCLabel, timeLabel);
-//
-//		layout.add(image,layout2,layout3);
-//		
-//		layout.addClickListener(event -> {
-//			extendedInformation.setEnabled(true);
-//			extendedInformation.setVisible(true);
-//			//
-//			expandButton.setEnabled(false);
-//			expandButton.setVisible(false);
-//			
-//			
-//		});
-//		//layout.addEventListener("mouseover",enevt -> System.out.println("oblgfbdfg"));
-//           
-//        
-//		
-//		return layout;
-//	}
-	
-//    private class TimeAndDateDeamonThread extends Thread {
-//    	
-//    	public void run() {
-//    		  try {sleep(5500);} catch (InterruptedException e) {}
-//    		 // System.out.println("in thread");
-//    		  try {
-//	    		  for (int i = 0; i < 70; i++) {
-//	            	
-//	                DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-//	                //DateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
-//	                Component layout = createMessageTemperatureComponent("images/noPhoto.png", "Бессонов Владимир Игнатьевич", "45.5",  timeFormat.format( System.currentTimeMillis()));
-//	    			listBoxLayout.addWithPush(layout);
-//	    			itemsList.add(layout);
-//	                //time.setText(timeFormat.format( System.currentTimeMillis()));
-//	               
-//	                //System.out.println("time "+timeFormat.format(System.currentTimeMillis())+"date "+dateFormat.format(System.currentTimeMillis()));
-//	    			 // System.out.println("add comp");
-//	                try {sleep(2500);} catch (InterruptedException e) {}                   	
-//	            }
-//    		  } catch (Exception e) {
-//				e.printStackTrace();
-//			}	  
-//        }
-//    	
-//    }
     
     public static ComponentEventListener<ClickEvent<HorizontalLayout>> getExtendedInformationListener(String fio, String division, String position, String idCard, String time, StreamResource imageResource) {
     	ComponentEventListener<ClickEvent<HorizontalLayout>> listener = new ComponentEventListener<ClickEvent<HorizontalLayout>>() {
@@ -226,7 +170,6 @@ public class Desktop extends VerticalLayout {
 			public void onComponentEvent(ClickEvent<HorizontalLayout> event) {
 				extendedInformation.setEnabled(true);
 				extendedInformation.setVisible(true);
-				//
 				expandButton.setEnabled(false);
 				expandButton.setVisible(false);
 				//
@@ -238,35 +181,12 @@ public class Desktop extends VerticalLayout {
 				
 		    	SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 		    	String filename = "myfilename-" + df.format(new Date()) + ".png";
-		    	
-		    	//imageResource.setF
-		    	//Desktop.photoExtendedInformation.se
-		    	Desktop.photoExtendedInformation.getElement().setAttribute("src", imageResource);
-				//(Desktop.photoExtendedInformation).setSrc(imageResource);
+		    	if(imageResource != null) Desktop.photoExtendedInformation.getElement().setAttribute("src", imageResource);
 			}
 		};
 		return listener;
     }
     
-//    public static void getI() {
-//    	//Image i = new Image();
-//    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("my");
-//    	EntityManager em = emf.createEntityManager();
-//    	// Retrieve image from database from user id = 1
-//
-//    	Query q = em.createQuery("SELECT photoByteArray FROM Employee WHERE id = 107");
-//    	byte[] bytes = (byte[]) q.getSingleResult();
-//		
-//		// Set the image from database
-//    	StreamResource imageResource = new StreamResource("",() -> new ByteArrayInputStream(bytes));
-//    	
-//    	SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-//    	String filename = "myfilename-" + df.format(new Date()) + ".png";
-//    	
-//    	//imageResource.setF
-//    	photoExtendedInformation.getElement().setAttribute("src", imageResource);
-//		//return i;
-//    }
 
 	public static HorizontalLayout getExtendedInformation() {
 		return extendedInformation;
