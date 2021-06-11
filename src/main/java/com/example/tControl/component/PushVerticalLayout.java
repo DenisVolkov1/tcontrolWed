@@ -35,6 +35,11 @@ public class PushVerticalLayout<T extends Component> extends VerticalLayout {
     public PushVerticalLayout(List<T> itemsList) {
     	this.listItems = itemsList;
 	}
+//    public PushVerticalLayout() {
+//    	//
+//	}
+
+    
 
 	@Override
     protected void onAttach(AttachEvent attachEvent) {
@@ -42,8 +47,8 @@ public class PushVerticalLayout<T extends Component> extends VerticalLayout {
     	System.out.println("attachEvent");
     	//isDetached = false;
     	ui =  attachEvent.getUI();
-    	thread2 = new FeederThreadAddPrevousItems(ui, this, listItems);
-    	thread2.start();
+//    	thread2 = new FeederThreadAddPrevousItems(ui, this, listItems);
+//    	thread2.start();
     	
 
     }
@@ -105,12 +110,12 @@ public class PushVerticalLayout<T extends Component> extends VerticalLayout {
         public void run() {
 
                 ui.access(() -> {
-                	synchronized (view) {
-                		//System.out.println(addedComponents.size());
-	                	for(Component c : addedComponents) {
-	                			view.add(c);
-	                	}
+           
+            		//System.out.println(addedComponents.size());
+                	for(Component c : addedComponents) {
+                			view.add(c);
                 	}
+                	
                     ui.getPushConfiguration().setPushMode(PushMode.MANUAL);
                     ui.push();
                 });

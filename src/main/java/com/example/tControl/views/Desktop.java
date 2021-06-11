@@ -109,9 +109,11 @@ public class Desktop extends VerticalLayout {
 		extendedInformation.add(labelExtendedInformation, photoExtendedInformation,rollUpButton,expandButton);
 		
 		itemsListTemperatureComponent = new ArrayList<MessageTemperatureComponent>();
-//			fillInItemsListTemperatureComponent();
+			fillInItemsListTemperatureComponent();
+			System.out.println("size =" + itemsListTemperatureComponent.size());
 				listBoxLayout =  new PushVerticalLayout<MessageTemperatureComponent>(itemsListTemperatureComponent);
-		
+					addingMessageTemperatureComponents();
+				
 		ListBox<Object> listBox = new ListBox<>();
 
 		listBox.addValueChangeListener(event -> {
@@ -139,12 +141,13 @@ public class Desktop extends VerticalLayout {
 		add(extendedInformation,expandButton,listBoxLayout);
 		
 	}
+
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
-		System.out.println("onAttach_Desktop");
-		itemsListTemperatureComponent = new ArrayList<MessageTemperatureComponent>();
-		fillInItemsListTemperatureComponent();
-			//listBoxLayout =  new PushVerticalLayout<MessageTemperatureComponent>(itemsListTemperatureComponent);
+//		System.out.println("onAttach_Desktop");
+//		itemsListTemperatureComponent = new ArrayList<MessageTemperatureComponent>();
+//		fillInItemsListTemperatureComponent();
+//			listBoxLayout =  new PushVerticalLayout<MessageTemperatureComponent>(itemsListTemperatureComponent);
 		
 	}
 
@@ -162,7 +165,13 @@ public class Desktop extends VerticalLayout {
 			}
 		}
 	}
-    
+	private void addingMessageTemperatureComponents() {
+		if(itemsListTemperatureComponent.size() > 0) {
+			for (MessageTemperatureComponent imtc : itemsListTemperatureComponent) {
+				listBoxLayout.add(imtc);
+			}
+		}
+	}
     public static ComponentEventListener<ClickEvent<HorizontalLayout>> getExtendedInformationListener(String fio, String division, String position, String idCard, String time, StreamResource imageResource) {
     	ComponentEventListener<ClickEvent<HorizontalLayout>> listener = new ComponentEventListener<ClickEvent<HorizontalLayout>>() {
 			
